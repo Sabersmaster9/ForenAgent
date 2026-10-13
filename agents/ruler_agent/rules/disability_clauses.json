@@ -1,0 +1,415 @@
+[
+  {
+    "standard_id": "human_disability_2016",
+    "clause_id": "5.8.6.1",
+    "branch_id": "5.8.6.1",
+    "grade": 8,
+    "source_heading": "八级 / 脊柱、骨盆及四肢损伤",
+    "source_text": "二椎体压缩性骨折（压缩程度均达1/3）",
+    "required_fact_fields": [
+      "forensic_facts.fracture_features.vertebral.count",
+      "forensic_facts.fracture_features.vertebral.compression_degree"
+    ],
+    "coverage_status": "covered",
+    "fixture_ids": [
+      "synthetic_spine_two_compression_degree_g8"
+    ]
+  },
+  {
+    "standard_id": "human_disability_2016",
+    "clause_id": "5.8.6.2",
+    "branch_id": "5.8.6.2",
+    "grade": 8,
+    "source_heading": "八级 / 脊柱、骨盆及四肢损伤",
+    "source_text": "三个以上椎体骨折，经手术治疗后",
+    "required_fact_fields": [
+      "forensic_facts.fracture_features.vertebral.count",
+      "forensic_facts.fracture_features.vertebral.has_spine_surgery"
+    ],
+    "coverage_status": "covered",
+    "fixture_ids": [
+      "synthetic_spine_three_surgery_g8"
+    ]
+  },
+  {
+    "standard_id": "human_disability_2016",
+    "clause_id": "5.9.6.1",
+    "branch_id": "5.9.6.1",
+    "grade": 9,
+    "source_heading": "九级 / 脊柱、骨盆及四肢损伤",
+    "source_text": "一椎体粉碎性骨折，椎管内骨性占位",
+    "required_fact_fields": [
+      "forensic_facts.fracture_features.vertebral.comminuted_fracture",
+      "forensic_facts.fracture_features.vertebral.spinal_canal_bony_occupancy"
+    ],
+    "coverage_status": "covered",
+    "fixture_ids": [
+      "synthetic_spine_burst_canal_g9"
+    ]
+  },
+  {
+    "standard_id": "human_disability_2016",
+    "clause_id": "5.9.6.2",
+    "branch_id": "5.9.6.2.a",
+    "grade": 9,
+    "source_heading": "九级 / 脊柱、骨盆及四肢损伤",
+    "source_text": "一椎体并相应附件骨折，经手术治疗后",
+    "required_fact_fields": [
+      "forensic_facts.fracture_features.vertebral.count",
+      "forensic_facts.fracture_features.vertebral.has_corresponding_appendix_fracture",
+      "forensic_facts.fracture_features.vertebral.has_spine_surgery"
+    ],
+    "coverage_status": "covered",
+    "fixture_ids": [
+      "synthetic_spine_one_with_appendix_surgery_g9"
+    ]
+  },
+  {
+    "standard_id": "human_disability_2016",
+    "clause_id": "5.9.6.2",
+    "branch_id": "5.9.6.2.b",
+    "grade": 9,
+    "source_heading": "九级 / 脊柱、骨盆及四肢损伤",
+    "source_text": "二椎体压缩性骨折",
+    "required_fact_fields": [
+      "forensic_facts.fracture_features.vertebral.count",
+      "forensic_facts.fracture_features.vertebral.compression_fracture"
+    ],
+    "coverage_status": "covered",
+    "fixture_ids": [
+      "golden_001_dingqifeng",
+      "synthetic_spine_two_compression_unknown_degree_g9"
+    ]
+  },
+  {
+    "standard_id": "human_disability_2016",
+    "clause_id": "5.10.6.2",
+    "branch_id": "5.10.6.2.a",
+    "grade": 10,
+    "source_heading": "十级 / 脊柱、骨盆及四肢损伤",
+    "source_text": "一椎体压缩性骨折（压缩程度达1/3）",
+    "required_fact_fields": [
+      "forensic_facts.fracture_features.vertebral.count",
+      "forensic_facts.fracture_features.vertebral.compression_degree"
+    ],
+    "coverage_status": "covered",
+    "fixture_ids": [
+      "synthetic_spine_one_compression_degree_g10"
+    ]
+  },
+  {
+    "standard_id": "human_disability_2016",
+    "clause_id": "5.10.6.2",
+    "branch_id": "5.10.6.2.b",
+    "grade": 10,
+    "source_heading": "十级 / 脊柱、骨盆及四肢损伤",
+    "source_text": "一椎体粉碎性骨折",
+    "required_fact_fields": [
+      "forensic_facts.fracture_features.vertebral.comminuted_fracture"
+    ],
+    "coverage_status": "covered",
+    "fixture_ids": [
+      "synthetic_spine_burst_g10"
+    ]
+  },
+  {
+    "standard_id": "human_disability_2016",
+    "clause_id": "5.10.6.2",
+    "branch_id": "5.10.6.2.c",
+    "grade": 10,
+    "source_heading": "十级 / 脊柱、骨盆及四肢损伤",
+    "source_text": "一椎体骨折经手术治疗后",
+    "required_fact_fields": [
+      "forensic_facts.fracture_features.vertebral.count",
+      "forensic_facts.fracture_features.vertebral.has_spine_surgery"
+    ],
+    "coverage_status": "covered",
+    "fixture_ids": [
+      "synthetic_spine_one_surgery_g10"
+    ]
+  },
+  {
+    "standard_id": "human_disability_2016",
+    "clause_id": "5.10.6.3",
+    "branch_id": "5.10.6.3",
+    "grade": 10,
+    "source_heading": "十级 / 脊柱、骨盆及四肢损伤",
+    "source_text": "四处以上横突、棘突或者椎弓根骨折，影响功能",
+    "required_fact_fields": [
+      "forensic_facts.fracture_features.vertebral.transverse_spinous_pedicle_fracture_count",
+      "forensic_facts.fracture_features.vertebral.affects_function"
+    ],
+    "coverage_status": "covered",
+    "fixture_ids": [
+      "synthetic_spine_posterior_four_g10"
+    ]
+  },
+  {
+    "standard_id": "human_disability_2016",
+    "clause_id": "5.8.3.6",
+    "branch_id": "5.8.3.6",
+    "grade": 8,
+    "source_heading": "八级 / 颈部及胸部损伤",
+    "source_text": "肋骨骨折12根以上并后遗6处畸形愈合",
+    "required_fact_fields": [
+      "forensic_facts.fracture_features.rib.count",
+      "forensic_facts.fracture_features.rib.deformity_healing_count"
+    ],
+    "coverage_status": "covered",
+    "fixture_ids": [
+      "synthetic_rib_twelve_deformity_six_g8"
+    ]
+  },
+  {
+    "standard_id": "human_disability_2016",
+    "clause_id": "5.9.3.11",
+    "branch_id": "5.9.3.11.a",
+    "grade": 9,
+    "source_heading": "九级 / 颈部及胸部损伤",
+    "source_text": "肋骨骨折12根以上，或者肋骨部分缺失4根以上",
+    "required_fact_fields": [
+      "forensic_facts.fracture_features.rib.count",
+      "forensic_facts.fracture_features.rib.missing_count"
+    ],
+    "coverage_status": "covered",
+    "fixture_ids": [
+      "synthetic_rib_twelve_g9"
+    ]
+  },
+  {
+    "standard_id": "human_disability_2016",
+    "clause_id": "5.9.3.11",
+    "branch_id": "5.9.3.11.b",
+    "grade": 9,
+    "source_heading": "九级 / 颈部及胸部损伤",
+    "source_text": "肋骨骨折8根以上并后遗4处畸形愈合",
+    "required_fact_fields": [
+      "forensic_facts.fracture_features.rib.count",
+      "forensic_facts.fracture_features.rib.deformity_healing_count"
+    ],
+    "coverage_status": "covered",
+    "fixture_ids": [
+      "synthetic_rib_eight_deformity_four_g9"
+    ]
+  },
+  {
+    "standard_id": "human_disability_2016",
+    "clause_id": "5.10.3.7",
+    "branch_id": "5.10.3.7.a",
+    "grade": 10,
+    "source_heading": "十级 / 颈部及胸部损伤",
+    "source_text": "肋骨骨折6根以上，或者肋骨部分缺失2根以上",
+    "required_fact_fields": [
+      "forensic_facts.fracture_features.rib.count",
+      "forensic_facts.fracture_features.rib.missing_count"
+    ],
+    "coverage_status": "covered",
+    "fixture_ids": [
+      "synthetic_rib_six_g10"
+    ]
+  },
+  {
+    "standard_id": "human_disability_2016",
+    "clause_id": "5.10.3.7",
+    "branch_id": "5.10.3.7.b",
+    "grade": 10,
+    "source_heading": "十级 / 颈部及胸部损伤",
+    "source_text": "肋骨骨折4根以上并后遗2处畸形愈合",
+    "required_fact_fields": [
+      "forensic_facts.fracture_features.rib.count",
+      "forensic_facts.fracture_features.rib.deformity_healing_count"
+    ],
+    "coverage_status": "covered",
+    "fixture_ids": [
+      "synthetic_rib_four_deformity_two_g10"
+    ]
+  },
+  {
+    "standard_id": "human_disability_2016",
+    "clause_id": "5.7.6.6/5.8.6.12/5.9.6.14/5.10.6.18",
+    "branch_id": "foot_arch_thresholds",
+    "grade": 7,
+    "source_heading": "脊柱、骨盆及四肢损伤 / 足弓结构破坏阈值组",
+    "source_text": "双足完全破坏、完全+部分、双足部分/单足完全、单足部分等足弓阈值",
+    "required_fact_fields": [
+      "forensic_facts.rule_features.foot_arch_complete_destroyed_count",
+      "forensic_facts.rule_features.foot_arch_partial_destroyed_count"
+    ],
+    "coverage_status": "covered",
+    "fixture_ids": [
+      "synthetic_foot_arch_partial_g10",
+      "synthetic_foot_arch_complete_g9"
+    ]
+  },
+  {
+    "standard_id": "human_disability_2016",
+    "clause_id": "5.7.6.1/5.8.6.6-7/5.9.6.7-8/5.10.6.9-10",
+    "branch_id": "limb_length_thresholds",
+    "grade": 7,
+    "source_heading": "脊柱、骨盆及四肢损伤 / 肢体长度差阈值组",
+    "source_text": "双上肢/双下肢长度差阈值",
+    "required_fact_fields": [
+      "forensic_facts.rule_features.upper_limb_length_diff_cm",
+      "forensic_facts.rule_features.lower_limb_length_diff_cm"
+    ],
+    "coverage_status": "covered",
+    "fixture_ids": [
+      "synthetic_lower_limb_diff_g10",
+      "synthetic_lower_limb_diff_g8"
+    ]
+  },
+  {
+    "standard_id": "human_disability_2016",
+    "clause_id": "5.9.6.3/5.10.6.4",
+    "branch_id": "pelvis_deformity_thresholds",
+    "grade": 9,
+    "source_heading": "九级/十级 / 脊柱、骨盆及四肢损伤",
+    "source_text": "骨盆两处以上骨折或者粉碎性骨折，畸形/严重畸形愈合",
+    "required_fact_fields": [
+      "forensic_facts.fracture_features.pelvis.two_plus_or_comminuted_deformity",
+      "forensic_facts.fracture_features.pelvis.two_plus_or_comminuted_severe_deformity"
+    ],
+    "coverage_status": "covered",
+    "fixture_ids": [
+      "synthetic_pelvis_deformity_g10",
+      "synthetic_pelvis_severe_deformity_g9"
+    ]
+  },
+  {
+    "standard_id": "human_disability_2016",
+    "clause_id": "5.9.6.13/5.10.6.17",
+    "branch_id": "calcaneus_deformity_thresholds",
+    "grade": 9,
+    "source_heading": "九级/十级 / 脊柱、骨盆及四肢损伤",
+    "source_text": "单/双足跟骨粉碎性骨折畸形愈合",
+    "required_fact_fields": [
+      "forensic_facts.fracture_features.calcaneus.comminuted_deformity_count"
+    ],
+    "coverage_status": "covered",
+    "fixture_ids": [
+      "synthetic_calcaneus_one_g10",
+      "synthetic_calcaneus_two_g9"
+    ]
+  },
+  {
+    "standard_id": "human_disability_2016",
+    "clause_id": "5.6.7.1/5.8.7.1/5.9.7.1/5.10.7.2",
+    "branch_id": "body_surface_scar_thresholds",
+    "grade": 6,
+    "source_heading": "体表及其他损伤 / 瘢痕体表面积阈值组",
+    "source_text": "皮肤瘢痕形成达体表面积50%、30%、10%、4%",
+    "required_fact_fields": [
+      "forensic_facts.rule_features.scar.body_surface_pct"
+    ],
+    "coverage_status": "covered",
+    "fixture_ids": [
+      "synthetic_body_scar_pct_g10",
+      "synthetic_body_scar_pct_g8"
+    ]
+  },
+  {
+    "standard_id": "human_disability_2016",
+    "clause_id": "5.9.2.4-6/5.10.2.4-6",
+    "branch_id": "face_scar_thresholds",
+    "grade": 9,
+    "source_heading": "头面部损伤 / 面部瘢痕阈值组",
+    "source_text": "面部条状、块状、片状细小瘢痕或色素异常阈值",
+    "required_fact_fields": [
+      "forensic_facts.rule_features.scar.face_linear_length_cm",
+      "forensic_facts.rule_features.scar.face_block_area_cm2",
+      "forensic_facts.rule_features.scar.face_patch_area_cm2"
+    ],
+    "coverage_status": "covered",
+    "fixture_ids": [
+      "synthetic_face_linear_scar_g10",
+      "synthetic_face_block_scar_g9"
+    ]
+  },
+  {
+    "standard_id": "human_disability_2016",
+    "clause_id": "5.7.2.4/5.9.2.16/5.10.2.9/5.10.1.8/5.9.6.5/5.10.6.13",
+    "branch_id": "structured_boolean_or_numeric_high_confidence",
+    "grade": 7,
+    "source_heading": "多系统高置信结构化特征组",
+    "source_text": "眼球缺失、眼眶骨折眼球内陷、开颅术后、关节置换、创伤性关节炎等",
+    "required_fact_fields": [
+      "forensic_facts.rule_features.*"
+    ],
+    "coverage_status": "covered",
+    "fixture_ids": [
+      "synthetic_eye_enophthalmos_g10",
+      "synthetic_joint_replacement_g9",
+      "synthetic_traumatic_arthritis_g10"
+    ]
+  },
+  {
+    "standard_id": "human_disability_2016",
+    "clause_id": "5.6.6.4/5.7.6.7/5.8.6.13/5.9.6.15/5.10.6.19",
+    "branch_id": "hand_foot_function_score_thresholds",
+    "grade": 6,
+    "source_heading": "脊柱、骨盆及四肢损伤 / 手足功能丧失分值阈值组",
+    "source_text": "手或者足功能丧失分值≥90/60/40/25/10分",
+    "required_fact_fields": [
+      "forensic_facts.rule_features.hand_or_foot_function_score",
+      "forensic_facts.amputation_features.hand_or_foot_function_score"
+    ],
+    "coverage_status": "covered",
+    "fixture_ids": [
+      "synthetic_hand_foot_score_g10",
+      "synthetic_hand_foot_score_g8"
+    ]
+  },
+  {
+    "standard_id": "human_disability_2016",
+    "clause_id": "5.8.2.7/5.9.2.11/5.10.2.15/5.8.2.8/5.9.2.13/5.10.2.17",
+    "branch_id": "vision_visual_field_numeric_thresholds",
+    "grade": 8,
+    "source_heading": "头面部损伤 / 视力视野数值阈值组",
+    "source_text": "一眼盲目4级/3级、中度视力损害、视野有效值阈值",
+    "required_fact_fields": [
+      "forensic_facts.rule_features.blindness_level_one_eye",
+      "forensic_facts.rule_features.moderate_visual_impairment_one_eye",
+      "forensic_facts.rule_features.visual_field_effective_pct_one_eye"
+    ],
+    "coverage_status": "partially_covered",
+    "fixture_ids": [
+      "synthetic_one_eye_blindness_level4_g8",
+      "synthetic_one_eye_moderate_visual_g10",
+      "synthetic_visual_field_g9"
+    ],
+    "notes": "先覆盖单眼明确数值/分级；双眼组合、年龄和专科复杂情形仍需人工复核。"
+  },
+  {
+    "standard_id": "human_disability_2016",
+    "clause_id": "5.10.6.7",
+    "branch_id": "limb_epiphyseal_involved",
+    "grade": 10,
+    "source_heading": "十级 / 脊柱、骨盆及四肢损伤",
+    "source_text": "青少年四肢长骨骨折累及骨骺",
+    "required_fact_fields": [
+      "forensic_facts.fracture_features.limb[].epiphyseal_involved",
+      "subject_birth/age"
+    ],
+    "coverage_status": "partially_covered",
+    "fixture_ids": [
+      "synthetic_limb_epiphyseal_g10"
+    ],
+    "notes": "结构化识别累及骨骺后可提示命中；青少年年龄条件需人工或结构化年龄字段确认。"
+  },
+  {
+    "standard_id": "human_disability_2016",
+    "clause_id": "5.8.6.5",
+    "branch_id": "chronic_osteomyelitis_long_nonunion",
+    "grade": 8,
+    "source_heading": "八级 / 脊柱、骨盆及四肢损伤",
+    "source_text": "四肢长骨开放性骨折并发慢性骨髓炎、大块死骨形成，长期不愈（1年以上）",
+    "required_fact_fields": [
+      "forensic_facts.fracture_healing_status.chronic_osteomyelitis_or_sequestrum",
+      "forensic_facts.fracture_healing_status.long_term_over_one_year"
+    ],
+    "coverage_status": "covered",
+    "fixture_ids": [
+      "synthetic_chronic_osteomyelitis_long_nonunion_g8"
+    ]
+  }
+]

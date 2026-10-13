@@ -1,0 +1,15 @@
+{
+  "case_id": "golden_001_dingqifeng",
+  "expected_disability": {
+    "clause": "5.9.6.2",
+    "branch_id": "5.9.6.2.b",
+    "grade": 9,
+    "rejected_clause": "5.8.6.1"
+  },
+  "expected_period": {
+    "clause_contains": "9.1.1",
+    "误工": 150,
+    "护理": 60,
+    "营养": 60
+  }
+}

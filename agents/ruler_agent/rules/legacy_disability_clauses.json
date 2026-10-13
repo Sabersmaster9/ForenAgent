@@ -1,0 +1,470 @@
+[
+  {
+    "clause": "5.10.6.11",
+    "text": "四肢任一大关节（踝关节除外）功能丧失25%以上",
+    "type": "joint_function_loss",
+    "applies_to": [
+      "肩关节",
+      "肘关节",
+      "腕关节",
+      "髋关节",
+      "膝关节"
+    ],
+    "grade": 10,
+    "min_loss_pct": 25.0,
+    "max_loss_pct": 49.9
+  },
+  {
+    "clause": "5.9.6.9",
+    "text": "四肢任一大关节（踝关节除外）功能丧失50%以上",
+    "type": "joint_function_loss",
+    "applies_to": [
+      "肩关节",
+      "肘关节",
+      "腕关节",
+      "髋关节",
+      "膝关节"
+    ],
+    "grade": 9,
+    "min_loss_pct": 50.0,
+    "max_loss_pct": 74.9
+  },
+  {
+    "clause": "5.8.6.8",
+    "text": "四肢任一大关节（踝关节除外）功能丧失75%以上",
+    "type": "joint_function_loss",
+    "applies_to": [
+      "肩关节",
+      "肘关节",
+      "腕关节",
+      "髋关节",
+      "膝关节"
+    ],
+    "grade": 8,
+    "min_loss_pct": 75.0,
+    "max_loss_pct": 89.9
+  },
+  {
+    "clause": "5.10.6.12",
+    "text": "一踝关节功能丧失50%以上",
+    "type": "joint_function_loss",
+    "applies_to": [
+      "踝关节"
+    ],
+    "grade": 10,
+    "min_loss_pct": 50.0,
+    "max_loss_pct": 74.9
+  },
+  {
+    "clause": "5.9.6.10",
+    "text": "一踝关节功能丧失75%以上",
+    "type": "joint_function_loss",
+    "applies_to": [
+      "踝关节"
+    ],
+    "grade": 9,
+    "min_loss_pct": 75.0,
+    "max_loss_pct": 89.9
+  },
+  {
+    "clause": "5.10.6.13",
+    "text": "下肢任一大关节骨折后遗创伤性关节炎",
+    "type": "diagnosis_match",
+    "applies_to": [
+      "髋关节",
+      "膝关节",
+      "踝关节"
+    ],
+    "grade": 10,
+    "keywords": [
+      "创伤性关节炎"
+    ],
+    "prerequisite": [
+      "骨折"
+    ]
+  },
+  {
+    "clause": "5.10.6.7",
+    "text": "四肢长骨骨折内固定术后",
+    "type": "fracture_surgery",
+    "applies_to": [],
+    "grade": 10,
+    "fracture_keywords": [
+      "肱骨骨折",
+      "桡骨骨折",
+      "尺骨骨折",
+      "股骨骨折",
+      "胫骨骨折",
+      "腓骨骨折",
+      "肱骨干骨折",
+      "肱骨近端骨折",
+      "肱骨髁上骨折",
+      "肱骨髁间骨折",
+      "股骨颈骨折",
+      "股骨粗隆间骨折",
+      "股骨干骨折",
+      "股骨远端骨折",
+      "股骨髁骨折",
+      "股骨外侧髁骨折",
+      "股骨内侧髁骨折",
+      "胫骨平台骨折",
+      "胫腓骨骨折",
+      "胫骨下端骨折",
+      "胫骨远端骨折",
+      "尺桡骨骨折",
+      "尺桡骨双骨折",
+      "前臂骨折"
+    ],
+    "surgery_keywords": [
+      "内固定",
+      "切复内固定",
+      "骨折内固定术",
+      "钢板内固定",
+      "髓内钉"
+    ]
+  },
+  {
+    "clause": "5.10.6.6",
+    "text": "一侧膝关节交叉韧带、半月板伴侧副韧带撕裂经手术治疗后遗功能障碍",
+    "type": "diagnosis_surgery",
+    "applies_to": [
+      "膝关节"
+    ],
+    "grade": 10,
+    "diagnosis_keywords": [
+      "交叉韧带",
+      "半月板",
+      "侧副韧带",
+      "韧带撕裂"
+    ],
+    "surgery_keywords": [
+      "手术",
+      "修补",
+      "重建",
+      "缝合"
+    ]
+  },
+  {
+    "clause": "5.9.6.5",
+    "text": "四肢任一大关节行关节假体置换术后",
+    "type": "surgery_match",
+    "applies_to": [
+      "肩关节",
+      "肘关节",
+      "腕关节",
+      "髋关节",
+      "膝关节",
+      "踝关节"
+    ],
+    "grade": 9,
+    "keywords": [
+      "关节置换",
+      "假体置换",
+      "人工关节",
+      "半髋置换",
+      "全髋置换",
+      "股骨头置换"
+    ]
+  },
+  {
+    "clause": "5.7.6.3",
+    "text": "四肢任一大关节（踝关节除外）强直固定于非功能位",
+    "type": "diagnosis_match",
+    "applies_to": [
+      "肩关节",
+      "肘关节",
+      "腕关节",
+      "髋关节",
+      "膝关节"
+    ],
+    "grade": 7,
+    "keywords": [
+      "强直固定于非功能位",
+      "强直于非功能位",
+      "关节强直固定"
+    ]
+  },
+  {
+    "clause": "5.8.6.9",
+    "text": "一踝关节强直固定于非功能位",
+    "type": "diagnosis_match",
+    "applies_to": [
+      "踝关节"
+    ],
+    "grade": 8,
+    "keywords": [
+      "踝关节强直固定",
+      "踝关节强直于非功能位"
+    ]
+  },
+  {
+    "clause": "5.10.3.7",
+    "text": "肋骨骨折6根以上，或者肋骨部分缺失2根以上",
+    "type": "diagnosis_match",
+    "applies_to": [],
+    "grade": 10,
+    "keywords": [
+      "肋骨骨折"
+    ],
+    "prerequisite": []
+  },
+  {
+    "clause": "5.9.3.11",
+    "text": "肋骨骨折12根以上，或者肋骨部分缺失4根以上",
+    "type": "diagnosis_match",
+    "applies_to": [],
+    "grade": 9,
+    "keywords": [
+      "肋骨骨折"
+    ],
+    "prerequisite": []
+  },
+  {
+    "clause": "5.10.6.4",
+    "text": "骨盆两处以上骨折或者粉碎性骨折，畸形愈合",
+    "type": "diagnosis_match",
+    "applies_to": [],
+    "grade": 10,
+    "keywords": [
+      "骨盆骨折",
+      "骨盆粉碎性骨折"
+    ],
+    "prerequisite": []
+  },
+  {
+    "clause": "5.9.6.3",
+    "text": "骨盆两处以上骨折或者粉碎性骨折，严重畸形愈合",
+    "type": "diagnosis_match",
+    "applies_to": [],
+    "grade": 9,
+    "keywords": [
+      "骨盆骨折",
+      "骨盆粉碎性骨折"
+    ],
+    "prerequisite": []
+  },
+  {
+    "clause": "5.10.6.2",
+    "text": "一椎体压缩性骨折（压缩程度达1/3）或者粉碎性骨折；一椎体骨折经手术治疗后",
+    "type": "diagnosis_surgery",
+    "applies_to": [],
+    "grade": 10,
+    "diagnosis_keywords": [
+      "椎体骨折",
+      "椎体压缩性骨折",
+      "椎体粉碎性骨折"
+    ],
+    "surgery_keywords": [
+      "椎体手术",
+      "椎体骨折手术"
+    ]
+  },
+  {
+    "clause": "5.10.6.3",
+    "text": "四处以上横突、棘突或者椎弓根骨折，影响功能",
+    "type": "diagnosis_match",
+    "applies_to": [],
+    "grade": 10,
+    "keywords": [
+      "横突骨折",
+      "棘突骨折",
+      "椎弓根骨折"
+    ]
+  },
+  {
+    "clause": "5.9.6.2",
+    "text": "一椎体并相应附件骨折，经手术治疗后；二椎体压缩性骨折",
+    "type": "diagnosis_surgery",
+    "applies_to": [],
+    "grade": 9,
+    "diagnosis_keywords": [
+      "椎体骨折",
+      "椎体附件骨折"
+    ],
+    "surgery_keywords": [
+      "椎体手术"
+    ]
+  },
+  {
+    "clause": "5.10.1.8",
+    "text": "开颅术后",
+    "type": "surgery_match",
+    "applies_to": [],
+    "grade": 10,
+    "keywords": [
+      "开颅术",
+      "开颅手术",
+      "颅骨修补"
+    ]
+  },
+  {
+    "clause": "5.9.1.3",
+    "text": "脑叶切除术后",
+    "type": "surgery_match",
+    "applies_to": [],
+    "grade": 9,
+    "keywords": [
+      "脑叶切除"
+    ]
+  },
+  {
+    "clause": "5.10.2.4",
+    "text": "面部条状瘢痕形成，累计长度达10.0cm",
+    "type": "diagnosis_match",
+    "applies_to": [],
+    "grade": 10,
+    "keywords": [
+      "面部瘢痕",
+      "面部条状瘢痕"
+    ]
+  },
+  {
+    "clause": "5.10.2.5",
+    "text": "面部块状瘢痕形成",
+    "type": "diagnosis_match",
+    "applies_to": [],
+    "grade": 10,
+    "keywords": [
+      "面部块状瘢痕"
+    ]
+  },
+  {
+    "clause": "5.10.2.10",
+    "text": "复视或者斜视",
+    "type": "diagnosis_match",
+    "applies_to": [],
+    "grade": 10,
+    "keywords": [
+      "复视",
+      "斜视"
+    ]
+  },
+  {
+    "clause": "5.10.2.15",
+    "text": "一眼中度视力损害",
+    "type": "diagnosis_match",
+    "applies_to": [],
+    "grade": 10,
+    "keywords": [
+      "视力损害"
+    ]
+  },
+  {
+    "clause": "5.9.2.16",
+    "text": "一眼眶骨折后遗眼球内陷5mm以上",
+    "type": "diagnosis_match",
+    "applies_to": [],
+    "grade": 9,
+    "keywords": [
+      "眼眶骨折",
+      "眼球内陷"
+    ]
+  },
+  {
+    "clause": "5.9.2.24",
+    "text": "张口受限II度",
+    "type": "diagnosis_match",
+    "applies_to": [],
+    "grade": 9,
+    "keywords": [
+      "张口受限"
+    ]
+  },
+  {
+    "clause": "5.10.2.26",
+    "text": "牙齿缺失或者折断7枚以上",
+    "type": "diagnosis_match",
+    "applies_to": [],
+    "grade": 10,
+    "keywords": [
+      "牙齿缺失",
+      "牙齿折断"
+    ]
+  },
+  {
+    "clause": "5.10.4.3",
+    "text": "胃、肠或者胆道修补术后",
+    "type": "surgery_match",
+    "applies_to": [],
+    "grade": 10,
+    "keywords": [
+      "胃修补",
+      "肠修补",
+      "胆道修补"
+    ]
+  },
+  {
+    "clause": "5.9.4.6",
+    "text": "肠部分切除术后",
+    "type": "surgery_match",
+    "applies_to": [],
+    "grade": 9,
+    "keywords": [
+      "肠切除"
+    ]
+  },
+  {
+    "clause": "5.10.5.1",
+    "text": "肾、输尿管或者膀胱修补术后",
+    "type": "surgery_match",
+    "applies_to": [],
+    "grade": 10,
+    "keywords": [
+      "肾修补",
+      "输尿管修补",
+      "膀胱修补"
+    ]
+  },
+  {
+    "clause": "5.7.6.2",
+    "text": "一下肢踝关节以上缺失",
+    "type": "diagnosis_match",
+    "applies_to": [],
+    "grade": 7,
+    "keywords": [
+      "下肢缺失",
+      "踝关节以上缺失"
+    ]
+  },
+  {
+    "clause": "5.10.6.14",
+    "text": "肢体重要血管循环障碍，影响功能",
+    "type": "diagnosis_match",
+    "applies_to": [],
+    "grade": 10,
+    "keywords": [
+      "血管循环障碍"
+    ]
+  },
+  {
+    "clause": "5.10.6.18",
+    "text": "一足足弓结构部分破坏",
+    "type": "diagnosis_match",
+    "applies_to": [],
+    "grade": 10,
+    "keywords": [
+      "足弓结构破坏",
+      "足弓破坏"
+    ]
+  },
+  {
+    "clause": "5.5.1.7",
+    "text": "非肢体瘫运动障碍（中度）",
+    "type": "diagnosis_match",
+    "applies_to": [],
+    "grade": 5,
+    "keywords": [
+      "非肢体瘫运动障碍"
+    ]
+  },
+  {
+    "clause": "5.7.1.4",
+    "text": "偏瘫（肌力4级以下）",
+    "type": "diagnosis_match",
+    "applies_to": [],
+    "grade": 7,
+    "keywords": [
+      "偏瘫"
+    ]
+  }
+]

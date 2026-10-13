@@ -1,0 +1,1348 @@
+[
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "4.1.1",
+    "title": "头皮下血肿",
+    "work_loss_range": [
+      7,
+      15
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "4.2.1",
+    "title": "钝器创口长度小于或等于 $6 \\mathrm{~cm}$ 、锐器创口长度小于或等于 $8 \\mathrm{~cm}$ ；",
+    "work_loss_range": [
+      20,
+      30
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "4.2.2",
+    "title": "钝器创口长度大于 $6\\mathrm{cm}$ 、锐器创口长度大于 $8\\mathrm{cm}$",
+    "work_loss_range": [
+      45,
+      60
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "4.3.1",
+    "title": "撕脱面积小于或等于 $20 \\mathrm{~cm}^{2}$",
+    "work_loss_range": [
+      60,
+      90
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "4.3.2",
+    "title": "撕脱面积大于 $20~\\mathrm{cm}^2$",
+    "work_loss_range": [
+      90,
+      120
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "4.4.1",
+    "title": "头皮缺损小于或等于 $10 \\mathrm{~cm}^{2}$",
+    "work_loss_range": [
+      30,
+      60
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "4.4.2",
+    "title": "头皮缺损大于 $10 \\mathrm{~cm}^{2}$",
+    "work_loss_range": [
+      60,
+      120
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "4.5.1",
+    "title": "单纯线状骨折",
+    "work_loss_range": [
+      30,
+      60
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "4.6.1",
+    "title": "单纯颅底骨折",
+    "work_loss_range": [
+      60,
+      90
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "4.6.2",
+    "title": "伴有脑脊液漏和/或神经损伤",
+    "work_loss_range": [
+      90,
+      120
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "4.7.1",
+    "title": "轻型",
+    "work_loss_range": [
+      30,
+      45
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "4.7.2",
+    "title": "中型",
+    "work_loss_range": [
+      90,
+      180
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "4.8.1",
+    "title": "不伴有神经系统体征",
+    "work_loss_range": [
+      30,
+      90
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "5.1.11",
+    "title": "视神经损伤[S04.001]",
+    "work_loss_range": [
+      90,
+      120
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "5.1.12",
+    "title": "眼球摘除[16.491]",
+    "work_loss_range": [
+      30,
+      60
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "5.1.13",
+    "title": "外伤性青光眼",
+    "work_loss_range": [
+      30,
+      180
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "5.1.14",
+    "title": "交感性眼炎、化脓性眼内炎[H44.102、H44.003]",
+    "work_loss_range": [
+      90,
+      180
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "5.1.15",
+    "title": "眼球后血肿",
+    "work_loss_range": [
+      45,
+      60
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "5.3.1",
+    "title": "鼻部皮肤创[S01.201]",
+    "work_loss_range": [
+      15,
+      30
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "5.3.2",
+    "title": "鼻翼缺损",
+    "work_loss_range": [
+      60,
+      90
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "5.3.4",
+    "title": "鼻窦损伤[S02.811]",
+    "work_loss_range": [
+      60,
+      90
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "5.4.1",
+    "title": "颌面部皮肤擦伤、挫伤[S00.859]",
+    "work_loss_range": [
+      15,
+      20
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "5.4.5",
+    "title": "牙槽骨骨折[S02.802]",
+    "work_loss_range": [
+      30,
+      60
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "5.4.7",
+    "title": "颞颌关节损伤[颌关节单纯脱位S03.051、颌关节哆开性脱位S03.052、颞下颌关节脱位S03.053、颞下颌(关节)(韧带)扭伤S03.452]",
+    "work_loss_range": [
+      60,
+      90
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "5.4.8",
+    "title": "舌损伤[S09.952]",
+    "work_loss_range": [
+      30,
+      90
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "5.4.9",
+    "title": "腮腺损伤",
+    "work_loss_range": [
+      30,
+      120
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "5.4.10",
+    "title": "面神经损伤[S04.501]",
+    "work_loss_range": [
+      90,
+      120
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "5.4.11",
+    "title": "三叉神经损伤[S04.351]",
+    "work_loss_range": [
+      120,
+      150
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "6.3.1",
+    "title": "喉挫伤不伴有软骨骨折",
+    "work_loss_range": [
+      7,
+      15
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "6.3.2",
+    "title": "喉切割伤",
+    "work_loss_range": [
+      30,
+      60
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "6.3.3",
+    "title": "喉损伤伴有软骨骨折",
+    "work_loss_range": [
+      60,
+      90
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "6.3.4",
+    "title": "喉烫伤或烧灼伤",
+    "work_loss_range": [
+      90,
+      180
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "6.4.1",
+    "title": "甲状腺功能轻度损伤",
+    "work_loss_range": [
+      45,
+      60
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "6.4.2",
+    "title": "甲状腺功能中度损伤",
+    "work_loss_range": [
+      90,
+      120
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "6.4.3",
+    "title": "甲状腺功能重度损伤",
+    "work_loss_range": [
+      150,
+      180
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "6.4.4",
+    "title": "伴有喉返神经损伤",
+    "work_loss_range": [
+      150,
+      180
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "6.5.1",
+    "title": "甲状旁腺功能轻度损伤",
+    "work_loss_range": [
+      45,
+      60
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "6.5.2",
+    "title": "甲状旁腺功能中度损伤",
+    "work_loss_range": [
+      90,
+      120
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "6.5.3",
+    "title": "甲状旁腺功能重度损伤",
+    "work_loss_range": [
+      150,
+      180
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "7.1.1",
+    "title": "擦伤/挫伤[S20.802/S20.201]",
+    "work_loss_range": [
+      15,
+      30
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "7.1.2",
+    "title": "皮肤创长度小于或等于 $20\\mathrm{cm}$ [S21.901]",
+    "work_loss_range": [
+      15,
+      30
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "7.1.3",
+    "title": "皮肤创长度大于 $20~\\mathrm{cm}$ [S21.901]",
+    "work_loss_range": [
+      30,
+      60
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "7.1.4",
+    "title": "胸壁异物存留[S21.952]",
+    "work_loss_range": [
+      30,
+      60
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "7.2.1",
+    "title": "一处骨折",
+    "work_loss_range": [
+      30,
+      45
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "7.2.2",
+    "title": "多根、多处骨折",
+    "work_loss_range": [
+      60,
+      120
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "7.4.1",
+    "title": "小量(肺压缩三分之一以下)",
+    "work_loss_range": [
+      15,
+      30
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "7.4.2",
+    "title": "中量(肺压缩三分之二以下)",
+    "work_loss_range": [
+      30,
+      90
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "7.4.3",
+    "title": "大量(肺压缩三分之二以上)",
+    "work_loss_range": [
+      90,
+      120
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "7.5.1",
+    "title": "小量(胸腔积血 $500~\\mathrm{mL}$ 以下)",
+    "work_loss_range": [
+      30,
+      60
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "7.5.2",
+    "title": "中量(胸腔积血 $500\\mathrm{mL}\\sim 1500\\mathrm{mL}$ )",
+    "work_loss_range": [
+      60,
+      90
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "7.5.3",
+    "title": "大量(胸腔积血 $1500\\mathrm{mL}$ 以上)",
+    "work_loss_range": [
+      90,
+      120
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "7.6.1",
+    "title": "肺挫伤[S27.301]",
+    "work_loss_range": [
+      30,
+      90
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "7.6.2",
+    "title": "肺裂伤修补术[S27.3152/33.491]",
+    "work_loss_range": [
+      60,
+      90
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "7.6.3",
+    "title": "肺叶切除[31.401]",
+    "work_loss_range": [
+      90,
+      120
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "7.6.4",
+    "title": "一侧全肺切除[32.501]",
+    "work_loss_range": [
+      120,
+      180
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "7.6.5",
+    "title": "肺爆震伤",
+    "work_loss_range": [
+      90,
+      120
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "7.6.6",
+    "title": "肺内异物存留或肺内异物摘除术[S17.852]",
+    "work_loss_range": [
+      60,
+      90
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "7.7.1",
+    "title": "保守治疗",
+    "work_loss_range": [
+      30,
+      60
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "7.7.2",
+    "title": "手术治疗",
+    "work_loss_range": [
+      90,
+      120
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "7.8.1",
+    "title": "保守治疗",
+    "work_loss_range": [
+      30,
+      60
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "7.8.2",
+    "title": "手术治疗",
+    "work_loss_range": [
+      90,
+      120
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "7.13.1",
+    "title": "腘疝形成[S27.801]",
+    "work_loss_range": [
+      30,
+      60
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "7.13.2",
+    "title": "手术治疗",
+    "work_loss_range": [
+      90,
+      120
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "8.1.1",
+    "title": "皮肤擦、挫伤[S30.852、S30.151]",
+    "work_loss_range": [
+      15,
+      30
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "8.1.2",
+    "title": "皮肤创长度小于或等于 $20~\\mathrm{cm}$",
+    "work_loss_range": [
+      15,
+      30
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "8.1.3",
+    "title": "皮肤创长度大于 $20~\\mathrm{cm}$",
+    "work_loss_range": [
+      30,
+      60
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "8.1.4",
+    "title": "腹壁异物存留",
+    "work_loss_range": [
+      45,
+      60
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "8.1.5",
+    "title": "腹部穿通伤行腹部探查术[54.111]",
+    "work_loss_range": [
+      45,
+      60
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "8.2.1",
+    "title": "非手术治疗",
+    "work_loss_range": [
+      60,
+      90
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "8.2.2",
+    "title": "修补术或部分切除术[50.221]",
+    "work_loss_range": [
+      90,
+      150
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "8.3.2",
+    "title": "部分切除或全牌摘除术[41.501]",
+    "work_loss_range": [
+      90,
+      120
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "8.4.1",
+    "title": "挫伤",
+    "work_loss_range": [
+      60,
+      90
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "8.4.2",
+    "title": "修补术",
+    "work_loss_range": [
+      90,
+      180
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "8.4.3",
+    "title": "部分切除或全胰腺切除术",
+    "work_loss_range": [
+      90,
+      180
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "8.4.4",
+    "title": "假性囊肿",
+    "work_loss_range": [
+      90,
+      180
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "8.5.1",
+    "title": "挫伤",
+    "work_loss_range": [
+      30,
+      90
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "8.5.2",
+    "title": "破裂",
+    "work_loss_range": [
+      90,
+      120
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "8.6.1",
+    "title": "空腔脏器修补术",
+    "work_loss_range": [
+      60,
+      90
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "8.6.2",
+    "title": "空腔脏器部分切除术",
+    "work_loss_range": [
+      90,
+      120
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "8.6.3",
+    "title": "腹部探查术",
+    "work_loss_range": [
+      60,
+      90
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "8.7.1",
+    "title": "挫伤",
+    "work_loss_range": [
+      15,
+      30
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "8.7.2",
+    "title": "破裂",
+    "work_loss_range": [
+      30,
+      90
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "8.7.3",
+    "title": "手术治疗",
+    "work_loss_range": [
+      60,
+      150
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "8.8.1",
+    "title": "挫伤",
+    "work_loss_range": [
+      15,
+      30
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "8.8.2",
+    "title": "破裂",
+    "work_loss_range": [
+      30,
+      90
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "8.8.3",
+    "title": "手术治疗",
+    "work_loss_range": [
+      60,
+      90
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "9.1.1",
+    "title": "脊柱骨折非手术治疗",
+    "work_loss_range": [
+      45,
+      150
+    ],
+    "coverage_status": "covered",
+    "nursing_range": [
+      45,
+      60
+    ],
+    "nutrition_range": [
+      45,
+      60
+    ],
+    "required_fact_fields": [
+      "forensic_facts.fracture_features.vertebral.count",
+      "forensic_facts.fracture_features.vertebral.has_spine_surgery"
+    ],
+    "fixture_ids": [
+      "golden_001_dingqifeng",
+      "synthetic_period_spine_non_surgery"
+    ]
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "9.1.2",
+    "title": "脊柱骨折手术治疗",
+    "work_loss_range": [
+      120,
+      180
+    ],
+    "coverage_status": "covered",
+    "nursing_range": [
+      60,
+      90
+    ],
+    "nutrition_range": [
+      60,
+      90
+    ],
+    "required_fact_fields": [
+      "forensic_facts.fracture_features.vertebral.count",
+      "forensic_facts.fracture_features.vertebral.has_spine_surgery"
+    ],
+    "fixture_ids": [
+      "synthetic_period_spine_surgery"
+    ]
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "9.3.1",
+    "title": "非手术治疗",
+    "work_loss_range": [
+      60,
+      120
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "9.3.2",
+    "title": "手术治疗",
+    "work_loss_range": [
+      90,
+      150
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "9.4.1",
+    "title": "脊髓震荡",
+    "work_loss_range": [
+      30,
+      60
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "9.5.1",
+    "title": "稳定型骨折",
+    "work_loss_range": [
+      60,
+      120
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "9.5.2",
+    "title": "不稳定型骨折",
+    "work_loss_range": [
+      120,
+      180
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "9.6.1",
+    "title": "挫伤[S30.252]",
+    "work_loss_range": [
+      1,
+      30
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "9.6.2",
+    "title": "裂伤[S31.251]",
+    "work_loss_range": [
+      15,
+      60
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "9.6.3",
+    "title": "脱位",
+    "work_loss_range": [
+      30,
+      60
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "9.6.4",
+    "title": "断裂或缺损[S38.251]",
+    "work_loss_range": [
+      30,
+      90
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "9.7.1",
+    "title": "阴囊血肿、鞘膜积血[S30.202]",
+    "work_loss_range": [
+      15,
+      60
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "9.7.2",
+    "title": "阴囊撕裂伤[S31.351(阴囊开放性伤口S31.301)]",
+    "work_loss_range": [
+      30,
+      90
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "9.8.1",
+    "title": "睾丸挫伤或脱位[S30.258]",
+    "work_loss_range": [
+      30,
+      60
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "9.8.2",
+    "title": "翠丸破裂[S31.352]",
+    "work_loss_range": [
+      60,
+      90
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "9.8.3",
+    "title": "一侧睾丸切除[62.301]",
+    "work_loss_range": [
+      60,
+      90
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "10.1.1",
+    "title": "皮肤擦、挫伤",
+    "work_loss_range": [
+      7,
+      15
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "10.1.2",
+    "title": "皮肤创长度小于或等于 $20~\\mathrm{cm}$",
+    "work_loss_range": [
+      15,
+      20
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "10.1.3",
+    "title": "皮肤创长度大于 $20\\mathrm{cm}$",
+    "work_loss_range": [
+      20,
+      30
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "10.6.1",
+    "title": "断肢",
+    "work_loss_range": [
+      120,
+      180
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "10.6.2",
+    "title": "断指",
+    "work_loss_range": [
+      60,
+      90
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "10.8.1",
+    "title": "臂丛及其重要分支神经损伤(尺神经/桡神经/正中神经/腋神经/肌皮神经)[S14.301]",
+    "work_loss_range": [
+      180,
+      365
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "10.8.2",
+    "title": "腰、骶丛及其重要分支神经(坐骨神经/股神经/胫神经/腓总神经)[S34.451]",
+    "work_loss_range": [
+      180,
+      365
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "11.1.1",
+    "title": "轻度",
+    "work_loss_range": [
+      30,
+      45
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "11.1.2",
+    "title": "中度",
+    "work_loss_range": [
+      60,
+      90
+    ],
+    "coverage_status": "not_started"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "7.2.1/7.2.2",
+    "title": "肋骨骨折一处/多根多处",
+    "work_loss_range": [
+      30,
+      120
+    ],
+    "nursing_range": [
+      7,
+      60
+    ],
+    "nutrition_range": [
+      15,
+      60
+    ],
+    "required_fact_fields": [
+      "forensic_facts.fracture_features.rib.count"
+    ],
+    "coverage_status": "covered",
+    "fixture_ids": [
+      "synthetic_period_rib_single",
+      "synthetic_period_rib_multiple"
+    ]
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "9.5.1/9.5.2",
+    "title": "骨盆稳定型/不稳定型骨折",
+    "work_loss_range": [
+      60,
+      180
+    ],
+    "nursing_range": [
+      20,
+      90
+    ],
+    "nutrition_range": [
+      30,
+      90
+    ],
+    "required_fact_fields": [
+      "forensic_facts.fracture_features.pelvis.unstable"
+    ],
+    "coverage_status": "covered",
+    "fixture_ids": [
+      "synthetic_period_pelvis_stable",
+      "synthetic_period_pelvis_unstable"
+    ]
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "10.2.1-10.2.18",
+    "title": "四肢骨折高频结构化规则族",
+    "work_loss_range": [
+      45,
+      365
+    ],
+    "nursing_range": [
+      20,
+      180
+    ],
+    "nutrition_range": [
+      20,
+      180
+    ],
+    "required_fact_fields": [
+      "forensic_facts.fracture_features.limb[].type",
+      "forensic_facts.fracture_features.limb[].has_surgery"
+    ],
+    "coverage_status": "partially_covered",
+    "fixture_ids": [
+      "synthetic_period_limb_femoral_neck_surgery",
+      "synthetic_period_limb_tibia_fibula_non_surgery"
+    ],
+    "notes": "已覆盖常见锁骨、肩胛、肱骨、尺桡骨、股骨、胫腓骨、踝、跟距骨等；手足小骨和个别亚型仍需继续细化。"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "10.1.1-10.1.3/8.1.1-8.1.3",
+    "title": "软组织擦挫伤、皮肤创长度阈值",
+    "work_loss_range": [
+      7,
+      60
+    ],
+    "nursing_range": [
+      0,
+      15
+    ],
+    "nutrition_range": [
+      1,
+      30
+    ],
+    "required_fact_fields": [
+      "forensic_facts.soft_tissue_features.region",
+      "forensic_facts.soft_tissue_features.wound_length_cm"
+    ],
+    "coverage_status": "covered",
+    "fixture_ids": [
+      "synthetic_period_limb_wound_large",
+      "synthetic_period_abdomen_wound_small"
+    ]
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "9.4.2/10.7/11.1.4/11.2.2/11.3",
+    "title": "标准要求根据临床治疗/恢复情况确定的条款组",
+    "work_loss_range": [
+      0,
+      0
+    ],
+    "nursing_range": [
+      0,
+      0
+    ],
+    "nutrition_range": [
+      0,
+      0
+    ],
+    "required_fact_fields": [
+      "forensic_facts.rule_features.clinical_course",
+      "forensic_facts.treatment_events"
+    ],
+    "coverage_status": "clinical_context_required",
+    "fixture_ids": [
+      "synthetic_period_spinal_cord_manual"
+    ],
+    "notes": "规则引擎只标记 manual_review，不自动编造天数。"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "10.4/10.5",
+    "title": "四肢大关节韧带损伤与主要肌腱断裂",
+    "work_loss_range": [
+      60,
+      150
+    ],
+    "nursing_range": [
+      0,
+      90
+    ],
+    "nutrition_range": [
+      0,
+      60
+    ],
+    "required_fact_fields": [
+      "forensic_facts.ligament_meniscus_features"
+    ],
+    "coverage_status": "partially_covered",
+    "fixture_ids": [
+      "synthetic_period_ligament_meniscus"
+    ],
+    "notes": "10.4可自动给区间；10.5护理/营养为临床确定，输出人工审查项。"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "10.6/10.7",
+    "title": "肢体/指趾离断与再植",
+    "work_loss_range": [
+      60,
+      180
+    ],
+    "nursing_range": [
+      30,
+      90
+    ],
+    "nutrition_range": [
+      30,
+      90
+    ],
+    "required_fact_fields": [
+      "forensic_facts.amputation_features.level",
+      "forensic_facts.amputation_features.is_replantation"
+    ],
+    "coverage_status": "partially_covered",
+    "fixture_ids": [
+      "synthetic_period_finger_amputation"
+    ],
+    "notes": "离断可按10.6自动给区间；再植10.7按标准标记临床恢复情况人工确定。"
+  },
+  {
+    "standard_id": "GA_T_1193_2014",
+    "clause_id": "5.1.11/5.1.12",
+    "title": "视神经损伤/视觉功能障碍与眼球摘除",
+    "work_loss_range": [
+      30,
+      120
+    ],
+    "nursing_range": [
+      15,
+      45
+    ],
+    "nutrition_range": [
+      15,
+      45
+    ],
+    "required_fact_fields": [
+      "forensic_facts.eye_facts",
+      "forensic_facts.rule_features.blindness_level_one_eye"
+    ],
+    "coverage_status": "covered",
+    "fixture_ids": [
+      "synthetic_period_eye_visual_impairment"
+    ]
+  }
+]

@@ -1,0 +1,832 @@
+[
+  {
+    "case_id": "synthetic_spine_two_compression_degree_g8",
+    "facts": {
+      "forensic_facts": {
+        "fracture_features": {
+          "vertebral": {
+            "levels": [
+              "T11",
+              "L1"
+            ],
+            "count": 2,
+            "compression_fracture": true,
+            "compression_degrees": [
+              0.34,
+              0.35
+            ],
+            "has_spine_surgery": false
+          }
+        },
+        "rule_features": {
+          "two_vertebral_compression_fractures": true,
+          "vertebral_count": 2,
+          "vertebra_levels": [
+            "T11",
+            "L1"
+          ]
+        }
+      }
+    },
+    "expected": {
+      "clause": "5.8.6.1",
+      "branch_id": "5.8.6.1",
+      "grade": 8
+    }
+  },
+  {
+    "case_id": "synthetic_spine_three_surgery_g8",
+    "facts": {
+      "forensic_facts": {
+        "fracture_features": {
+          "vertebral": {
+            "levels": [
+              "T11",
+              "T12",
+              "L1"
+            ],
+            "count": 3,
+            "compression_fracture": false,
+            "has_spine_surgery": true
+          }
+        },
+        "rule_features": {
+          "vertebral_count": 3,
+          "vertebra_levels": [
+            "T11",
+            "T12",
+            "L1"
+          ]
+        }
+      }
+    },
+    "expected": {
+      "clause": "5.8.6.2",
+      "branch_id": "5.8.6.2",
+      "grade": 8
+    }
+  },
+  {
+    "case_id": "synthetic_spine_two_compression_unknown_degree_g9",
+    "facts": {
+      "forensic_facts": {
+        "fracture_features": {
+          "vertebral": {
+            "levels": [
+              "T11",
+              "L1"
+            ],
+            "count": 2,
+            "compression_fracture": true,
+            "compression_degree": "不详",
+            "has_spine_surgery": false
+          }
+        },
+        "rule_features": {
+          "two_vertebral_compression_fractures": true,
+          "vertebral_count": 2,
+          "vertebra_levels": [
+            "T11",
+            "L1"
+          ]
+        }
+      }
+    },
+    "expected": {
+      "clause": "5.9.6.2",
+      "branch_id": "5.9.6.2.b",
+      "grade": 9
+    }
+  },
+  {
+    "case_id": "synthetic_spine_burst_canal_g9",
+    "facts": {
+      "forensic_facts": {
+        "fracture_features": {
+          "vertebral": {
+            "levels": [
+              "L1"
+            ],
+            "count": 1,
+            "comminuted_fracture": true,
+            "canal_occupancy": true
+          }
+        },
+        "rule_features": {
+          "vertebral_count": 1
+        }
+      }
+    },
+    "expected": {
+      "clause": "5.9.6.1",
+      "branch_id": "5.9.6.1",
+      "grade": 9
+    }
+  },
+  {
+    "case_id": "synthetic_spine_one_with_appendix_surgery_g9",
+    "facts": {
+      "forensic_facts": {
+        "fracture_features": {
+          "vertebral": {
+            "levels": [
+              "L1"
+            ],
+            "count": 1,
+            "has_corresponding_appendix_fracture": true,
+            "has_spine_surgery": true
+          }
+        },
+        "rule_features": {
+          "vertebral_count": 1
+        }
+      }
+    },
+    "expected": {
+      "clause": "5.9.6.2",
+      "branch_id": "5.9.6.2.a",
+      "grade": 9
+    }
+  },
+  {
+    "case_id": "synthetic_spine_one_compression_degree_g10",
+    "facts": {
+      "forensic_facts": {
+        "fracture_features": {
+          "vertebral": {
+            "levels": [
+              "L1"
+            ],
+            "count": 1,
+            "compression_fracture": true,
+            "compression_degree": 0.34,
+            "has_spine_surgery": false
+          }
+        },
+        "rule_features": {
+          "vertebral_count": 1,
+          "vertebra_levels": [
+            "L1"
+          ]
+        }
+      }
+    },
+    "expected": {
+      "clause": "5.10.6.2",
+      "branch_id": "5.10.6.2.a",
+      "grade": 10
+    }
+  },
+  {
+    "case_id": "synthetic_spine_burst_g10",
+    "facts": {
+      "forensic_facts": {
+        "fracture_features": {
+          "vertebral": {
+            "levels": [
+              "L1"
+            ],
+            "count": 1,
+            "comminuted_fracture": true,
+            "canal_occupancy": false
+          }
+        },
+        "rule_features": {
+          "vertebral_count": 1
+        }
+      }
+    },
+    "expected": {
+      "clause": "5.10.6.2",
+      "branch_id": "5.10.6.2.b",
+      "grade": 10
+    }
+  },
+  {
+    "case_id": "synthetic_spine_one_surgery_g10",
+    "facts": {
+      "forensic_facts": {
+        "fracture_features": {
+          "vertebral": {
+            "levels": [
+              "L1"
+            ],
+            "count": 1,
+            "compression_fracture": false,
+            "has_spine_surgery": true
+          }
+        },
+        "rule_features": {
+          "vertebral_count": 1
+        }
+      }
+    },
+    "expected": {
+      "clause": "5.10.6.2",
+      "branch_id": "5.10.6.2.c",
+      "grade": 10
+    }
+  },
+  {
+    "case_id": "synthetic_spine_posterior_four_g10",
+    "facts": {
+      "forensic_facts": {
+        "fracture_features": {
+          "vertebral": {
+            "transverse_spinous_pedicle_fracture_count": 4,
+            "affects_function": true
+          }
+        },
+        "rule_features": {}
+      }
+    },
+    "expected": {
+      "clause": "5.10.6.3",
+      "branch_id": "5.10.6.3",
+      "grade": 10
+    }
+  },
+  {
+    "case_id": "synthetic_rib_twelve_deformity_six_g8",
+    "facts": {
+      "forensic_facts": {
+        "fracture_features": {
+          "rib": {
+            "count": 12,
+            "deformity_healing_count": 6,
+            "evidence": [
+              "双侧共12根肋骨骨折，其中6处畸形愈合"
+            ]
+          }
+        },
+        "rule_features": {}
+      }
+    },
+    "expected": {
+      "clause": "5.8.3.6",
+      "branch_id": "5.8.3.6",
+      "grade": 8
+    }
+  },
+  {
+    "case_id": "synthetic_rib_twelve_g9",
+    "facts": {
+      "forensic_facts": {
+        "fracture_features": {
+          "rib": {
+            "count": 12,
+            "evidence": [
+              "双侧共12根肋骨骨折"
+            ]
+          }
+        },
+        "rule_features": {
+          "rib_fracture_count": 12,
+          "rib_fracture_twelve_plus": true
+        }
+      }
+    },
+    "expected": {
+      "clause": "5.9.3.11",
+      "grade": 9
+    }
+  },
+  {
+    "case_id": "synthetic_rib_eight_deformity_four_g9",
+    "facts": {
+      "forensic_facts": {
+        "fracture_features": {
+          "rib": {
+            "count": 8,
+            "deformity_healing_count": 4,
+            "evidence": [
+              "左侧第3-10肋骨骨折，其中4处畸形愈合"
+            ]
+          }
+        },
+        "rule_features": {}
+      }
+    },
+    "expected": {
+      "clause": "5.9.3.11",
+      "branch_id": "5.9.3.11.b",
+      "grade": 9
+    }
+  },
+  {
+    "case_id": "synthetic_rib_six_g10",
+    "facts": {
+      "forensic_facts": {
+        "fracture_features": {
+          "rib": {
+            "count": 6,
+            "evidence": [
+              "左侧第4-9肋骨骨折"
+            ]
+          }
+        },
+        "rule_features": {
+          "rib_fracture_count": 6,
+          "rib_fracture_six_plus": true
+        }
+      }
+    },
+    "expected": {
+      "clause": "5.10.3.7",
+      "grade": 10
+    }
+  },
+  {
+    "case_id": "synthetic_rib_four_deformity_two_g10",
+    "facts": {
+      "forensic_facts": {
+        "fracture_features": {
+          "rib": {
+            "count": 4,
+            "deformity_healing_count": 2,
+            "evidence": [
+              "右侧第5-8肋骨骨折，其中2处畸形愈合"
+            ]
+          }
+        },
+        "rule_features": {}
+      }
+    },
+    "expected": {
+      "clause": "5.10.3.7",
+      "branch_id": "5.10.3.7.b",
+      "grade": 10
+    }
+  },
+  {
+    "case_id": "synthetic_lower_limb_diff_g8",
+    "facts": {
+      "forensic_facts": {
+        "rule_features": {
+          "limb_length_diff": {
+            "lower_cm": 6.2
+          }
+        }
+      }
+    },
+    "expected": {
+      "clause": "5.8.6.7",
+      "branch_id": "5.8.6.7",
+      "grade": 8
+    }
+  },
+  {
+    "case_id": "synthetic_lower_limb_diff_g10",
+    "facts": {
+      "forensic_facts": {
+        "rule_features": {
+          "limb_length_diff": {
+            "lower_cm": 2.5
+          }
+        }
+      }
+    },
+    "expected": {
+      "clause": "5.10.6.10",
+      "branch_id": "5.10.6.10",
+      "grade": 10
+    }
+  },
+  {
+    "case_id": "synthetic_foot_arch_partial_g10",
+    "facts": {
+      "forensic_facts": {
+        "rule_features": {
+          "foot_arch": {
+            "partial_destroyed_count": 1
+          }
+        }
+      }
+    },
+    "expected": {
+      "clause": "5.10.6.18",
+      "branch_id": "5.10.6.18",
+      "grade": 10
+    }
+  },
+  {
+    "case_id": "synthetic_foot_arch_complete_g9",
+    "facts": {
+      "forensic_facts": {
+        "rule_features": {
+          "foot_arch": {
+            "complete_destroyed_count": 1
+          }
+        }
+      }
+    },
+    "expected": {
+      "clause": "5.9.6.14",
+      "branch_id": "5.9.6.14",
+      "grade": 9
+    }
+  },
+  {
+    "case_id": "synthetic_pelvis_deformity_g10",
+    "facts": {
+      "forensic_facts": {
+        "fracture_features": {
+          "pelvis": {
+            "two_plus_or_comminuted_deformity": true
+          }
+        },
+        "rule_features": {}
+      }
+    },
+    "expected": {
+      "clause": "5.10.6.4",
+      "branch_id": "5.10.6.4",
+      "grade": 10
+    }
+  },
+  {
+    "case_id": "synthetic_pelvis_severe_deformity_g9",
+    "facts": {
+      "forensic_facts": {
+        "fracture_features": {
+          "pelvis": {
+            "two_plus_or_comminuted_severe_deformity": true
+          }
+        },
+        "rule_features": {}
+      }
+    },
+    "expected": {
+      "clause": "5.9.6.3",
+      "branch_id": "5.9.6.3",
+      "grade": 9
+    }
+  },
+  {
+    "case_id": "synthetic_calcaneus_one_g10",
+    "facts": {
+      "forensic_facts": {
+        "fracture_features": {
+          "calcaneus": {
+            "comminuted_deformity_count": 1
+          }
+        },
+        "rule_features": {}
+      }
+    },
+    "expected": {
+      "clause": "5.10.6.17",
+      "branch_id": "5.10.6.17",
+      "grade": 10
+    }
+  },
+  {
+    "case_id": "synthetic_calcaneus_two_g9",
+    "facts": {
+      "forensic_facts": {
+        "fracture_features": {
+          "calcaneus": {
+            "comminuted_deformity_count": 2
+          }
+        },
+        "rule_features": {}
+      }
+    },
+    "expected": {
+      "clause": "5.9.6.13",
+      "branch_id": "5.9.6.13",
+      "grade": 9
+    }
+  },
+  {
+    "case_id": "synthetic_body_scar_pct_g10",
+    "facts": {
+      "forensic_facts": {
+        "rule_features": {
+          "scar": {
+            "body_surface_pct": 4.5
+          }
+        }
+      }
+    },
+    "expected": {
+      "clause": "5.10.7.2",
+      "branch_id": "5.10.7.2",
+      "grade": 10
+    }
+  },
+  {
+    "case_id": "synthetic_body_scar_pct_g8",
+    "facts": {
+      "forensic_facts": {
+        "rule_features": {
+          "scar": {
+            "body_surface_pct": 32
+          }
+        }
+      }
+    },
+    "expected": {
+      "clause": "5.8.7.1",
+      "branch_id": "5.8.7.1",
+      "grade": 8
+    }
+  },
+  {
+    "case_id": "synthetic_face_linear_scar_g10",
+    "facts": {
+      "forensic_facts": {
+        "rule_features": {
+          "scar": {
+            "face_linear_length_cm": 11
+          }
+        }
+      }
+    },
+    "expected": {
+      "clause": "5.10.2.4",
+      "branch_id": "5.10.2.4",
+      "grade": 10
+    }
+  },
+  {
+    "case_id": "synthetic_face_block_scar_g9",
+    "facts": {
+      "forensic_facts": {
+        "rule_features": {
+          "scar": {
+            "face_block_area_cm2": 7.5
+          }
+        }
+      }
+    },
+    "expected": {
+      "clause": "5.9.2.5",
+      "branch_id": "5.9.2.5",
+      "grade": 9
+    }
+  },
+  {
+    "case_id": "synthetic_eye_enophthalmos_g10",
+    "facts": {
+      "forensic_facts": {
+        "rule_features": {
+          "orbital_enophthalmos_mm": 2.5
+        }
+      }
+    },
+    "expected": {
+      "clause": "5.10.2.9",
+      "branch_id": "5.10.2.9",
+      "grade": 10
+    }
+  },
+  {
+    "case_id": "synthetic_joint_replacement_g9",
+    "facts": {
+      "forensic_facts": {
+        "rule_features": {
+          "major_joint_replacement": true
+        }
+      }
+    },
+    "expected": {
+      "clause": "5.9.6.5",
+      "branch_id": "5.9.6.5",
+      "grade": 9
+    }
+  },
+  {
+    "case_id": "synthetic_traumatic_arthritis_g10",
+    "facts": {
+      "forensic_facts": {
+        "rule_features": {
+          "traumatic_arthritis": true
+        }
+      }
+    },
+    "expected": {
+      "clause": "5.10.6.13",
+      "branch_id": "5.10.6.13",
+      "grade": 10
+    }
+  },
+  {
+    "case_id": "synthetic_hand_foot_score_g10",
+    "facts": {
+      "forensic_facts": {
+        "rule_features": {
+          "hand_or_foot_function_score": 12,
+          "amputation_features": {
+            "hand_or_foot_function_score": 12
+          }
+        }
+      }
+    },
+    "expected": {
+      "clause": "5.10.6.19",
+      "branch_id": "5.10.6.19",
+      "grade": 10
+    }
+  },
+  {
+    "case_id": "synthetic_hand_foot_score_g8",
+    "facts": {
+      "forensic_facts": {
+        "rule_features": {
+          "hand_or_foot_function_score": 45
+        }
+      }
+    },
+    "expected": {
+      "clause": "5.8.6.13",
+      "branch_id": "5.8.6.13",
+      "grade": 8
+    }
+  },
+  {
+    "case_id": "synthetic_one_eye_blindness_level4_g8",
+    "facts": {
+      "forensic_facts": {
+        "rule_features": {
+          "blindness_level_one_eye": 4
+        }
+      }
+    },
+    "expected": {
+      "clause": "5.8.2.7",
+      "branch_id": "5.8.2.7",
+      "grade": 8
+    }
+  },
+  {
+    "case_id": "synthetic_one_eye_moderate_visual_g10",
+    "facts": {
+      "forensic_facts": {
+        "rule_features": {
+          "moderate_visual_impairment_one_eye": true
+        }
+      }
+    },
+    "expected": {
+      "clause": "5.10.2.15",
+      "branch_id": "5.10.2.15",
+      "grade": 10
+    }
+  },
+  {
+    "case_id": "synthetic_visual_field_g9",
+    "facts": {
+      "forensic_facts": {
+        "rule_features": {
+          "visual_field_effective_pct_one_eye": 8
+        }
+      }
+    },
+    "expected": {
+      "clause": "5.9.2.13",
+      "branch_id": "5.9.2.13",
+      "grade": 9
+    }
+  },
+  {
+    "case_id": "synthetic_limb_epiphyseal_g10",
+    "facts": {
+      "forensic_facts": {
+        "fracture_features": {
+          "limb": [
+            {
+              "type": "humerus",
+              "epiphyseal_involved": true
+            }
+          ]
+        },
+        "rule_features": {
+          "limb_fractures": [
+            {
+              "type": "humerus",
+              "epiphyseal_involved": true
+            }
+          ]
+        }
+      }
+    },
+    "expected": {
+      "clause": "5.10.6.7",
+      "branch_id": "5.10.6.7",
+      "grade": 10
+    }
+  },
+  {
+    "case_id": "synthetic_chronic_osteomyelitis_long_nonunion_g8",
+    "facts": {
+      "forensic_facts": {
+        "rule_features": {
+          "chronic_osteomyelitis_long_nonunion": true,
+          "fracture_healing_status": {
+            "chronic_osteomyelitis_or_sequestrum": true,
+            "long_term_over_one_year": true
+          }
+        }
+      }
+    },
+    "expected": {
+      "clause": "5.8.6.5",
+      "branch_id": "5.8.6.5",
+      "grade": 8
+    }
+  },
+  {
+    "case_id": "synthetic_negative_rib_three",
+    "facts": {
+      "forensic_facts": {
+        "fracture_features": {
+          "rib": {
+            "count": 3,
+            "evidence": [
+              "左侧第5-7肋骨骨折"
+            ]
+          }
+        },
+        "rule_features": {
+          "rib_fracture_count": 3
+        }
+      }
+    },
+    "expected": {
+      "clause": "",
+      "branch_id": "negative_rib_below_threshold",
+      "grade": 0,
+      "match_type": "negative_rib_threshold"
+    }
+  },
+  {
+    "case_id": "synthetic_negative_spine_single_compression_below_third",
+    "facts": {
+      "forensic_facts": {
+        "fracture_features": {
+          "vertebral": {
+            "levels": [
+              "L1"
+            ],
+            "count": 1,
+            "compression_fracture": true,
+            "compression_degree": "未达1/3",
+            "has_spine_surgery": false
+          }
+        },
+        "rule_features": {
+          "vertebral_count": 1
+        }
+      }
+    },
+    "expected": {
+      "clause": "",
+      "branch_id": "negative_spine_single_compression_below_threshold",
+      "grade": 0,
+      "match_type": "negative_spine_threshold"
+    }
+  },
+  {
+    "case_id": "synthetic_negative_scar_below_threshold",
+    "facts": {
+      "forensic_facts": {
+        "rule_features": {
+          "scar": {
+            "body_surface_pct": 2.0,
+            "face_linear_length_cm": 4.0
+          }
+        }
+      }
+    },
+    "expected": {
+      "clause": "",
+      "branch_id": "negative_scar_below_threshold",
+      "grade": 0,
+      "match_type": "negative_scar_threshold"
+    }
+  },
+  {
+    "case_id": "synthetic_negative_visual_hess_normal",
+    "facts": {
+      "forensic_facts": {
+        "eye_facts": {
+          "corrected_visual_acuity": [
+            {
+              "side": "左",
+              "value": "0.8"
+            }
+          ],
+          "hess_screen_abnormal": false
+        },
+        "rule_features": {}
+      }
+    },
+    "expected": {
+      "clause": "",
+      "branch_id": "negative_visual_below_threshold",
+      "grade": 0,
+      "match_type": "negative_visual_threshold"
+    }
+  }
+]
