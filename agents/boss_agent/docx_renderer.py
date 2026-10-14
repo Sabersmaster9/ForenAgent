@@ -156,6 +156,7 @@ def _add_paragraph(
     space_before_pt: float = 0.0,
     space_after_pt: float = 0.0,
     line_spacing_pt: Optional[float] = None,
+    extra_runs: Optional[List[Tuple[str, str, float]]] = None,
 ) -> None:
     paragraph = doc.add_paragraph()
     paragraph.paragraph_format.line_spacing_rule = WD_LINE_SPACING.EXACTLY
@@ -168,6 +169,12 @@ def _add_paragraph(
     _set_first_line_indent_chars(paragraph, indent_chars, size_pt)
     run = paragraph.add_run(text)
     _set_run_font(run, font_name, size_pt, bold=bold)
+    # 同一段落内的追加片段，用于「标签：值」这类混排（标签黑体、内容仿宋）。
+    for seg_text, seg_font, seg_size in extra_runs or []:
+        if not seg_text:
+            continue
+        seg_run = paragraph.add_run(seg_text)
+        _set_run_font(seg_run, seg_font, seg_size)
 
 
 def classify_lines(report_text: str) -> List[Tuple[str, str]]:
@@ -315,9 +322,14 @@ def render_report_docx(
                 indent_chars=FIRST_LINE_INDENT_CHARS,
             )
         elif role == "label":
+            # 样本里只有「标签：」用黑体，后面填的内容仍是正文仿宋，必须同段混排。
+            match = LABEL_RE.match(text)
+            label_text = text[: match.end()] if match else text
+            value_text = text[match.end():] if match else ""
             _add_paragraph(
-                doc, text, LABEL_FONT, LABEL_SIZE_PT,
+                doc, label_text, LABEL_FONT, LABEL_SIZE_PT,
                 indent_chars=FIRST_LINE_INDENT_CHARS,
+                extra_runs=[(value_text, BODY_FONT, BODY_SIZE_PT)],
             )
         elif role == "signature":
             # 落款签名与执业证号，样本里靠右缩进排版

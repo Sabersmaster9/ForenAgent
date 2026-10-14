@@ -4981,11 +4981,65 @@ def run_case_batch(
 # 模块8：GUI界面
 # ============================================================
 
+def _fit_window_to_screen(
+    window,
+    width: int,
+    height: int,
+    min_width: int = 0,
+    min_height: int = 0,
+) -> None:
+    """把窗口收进屏幕可视范围并居中。
+
+    1280×860 这类尺寸在 1366×768 的笔记本上会超出屏幕，底部按钮点不到。
+    这里统一按屏幕尺寸裁剪，并把 minsize 一并收进可用范围，避免用户拖不小。
+    """
+    try:
+        screen_w = window.winfo_screenwidth()
+        screen_h = window.winfo_screenheight()
+    except Exception:
+        window.geometry(f"{width}x{height}")
+        return
+    # 留出任务栏与窗口边框余量
+    max_w = max(640, screen_w - 80)
+    max_h = max(480, screen_h - 140)
+    actual_w = min(width, max_w)
+    actual_h = min(height, max_h)
+    x = max(0, (screen_w - actual_w) // 2)
+    y = max(0, (screen_h - actual_h) // 3)
+    window.geometry(f"{actual_w}x{actual_h}+{x}+{y}")
+    if min_width or min_height:
+        window.minsize(min(min_width, actual_w), min(min_height, actual_h))
+
+
+def _apply_ui_style(root) -> None:
+    """统一 ttk 控件字体与按钮层级，让界面清爽一些。"""
+    style = ttk.Style(root)
+    try:
+        style.theme_use("vista")
+    except Exception:
+        pass
+    base_font = ("Microsoft YaHei UI", 10)
+    root.option_add("*Font", base_font)
+    for name in ("TLabel", "TButton", "TEntry", "TLabelframe.Label", "TRadiobutton", "TCheckbutton"):
+        try:
+            style.configure(name, font=base_font)
+        except Exception:
+            pass
+    try:
+        style.configure("TLabelframe.Label", foreground="#1a3d6d")
+        # 主操作按钮加重，一眼能看到要点哪个
+        style.configure("Primary.TButton", font=("Microsoft YaHei UI", 11, "bold"), padding=(14, 6))
+        style.configure("Hint.TLabel", foreground="#6b7280")
+    except Exception:
+        pass
+
+
 class BossAgentGUI:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("ForenAgent 1.0 — 鉴定意见书生成")
-        self.root.geometry("860x650")
+        _apply_ui_style(self.root)
+        _fit_window_to_screen(self.root, 900, 720, min_width=760, min_height=560)
         self.root.resizable(True, True)
 
         # 输入改为两步选文件夹：① 案件材料（必选）② 检查照片（可选）。
@@ -5026,7 +5080,7 @@ class BossAgentGUI:
 
         # --- 输入区（两步）---
         frame_input = ttk.LabelFrame(tab_run, text="案件输入", padding=10)
-        frame_input.pack(fill="x", padx=10, pady=5)
+        frame_input.pack(fill="x", padx=10, pady=(6, 4))
 
         row1 = ttk.Frame(frame_input)
         row1.pack(fill="x")
@@ -5035,7 +5089,7 @@ class BossAgentGUI:
         ttk.Entry(row1, textvariable=self.materials_var, state="readonly").pack(
             side="left", fill="x", expand=True, padx=6
         )
-        ttk.Label(row1, text="（必选）", foreground="#666666").pack(side="left")
+        ttk.Label(row1, text="（必选）", style="Hint.TLabel").pack(side="left")
 
         row2 = ttk.Frame(frame_input)
         row2.pack(fill="x", pady=(6, 0))
@@ -5044,7 +5098,7 @@ class BossAgentGUI:
         ttk.Entry(row2, textvariable=self.photo_var, state="readonly").pack(
             side="left", fill="x", expand=True, padx=6
         )
-        ttk.Label(row2, text="（可选，没有可不选）", foreground="#666666").pack(side="left")
+        ttk.Label(row2, text="（可选，没有可不选）", style="Hint.TLabel").pack(side="left")
 
         row3 = ttk.Frame(frame_input)
         row3.pack(fill="x", pady=(8, 0))
@@ -5067,12 +5121,12 @@ class BossAgentGUI:
         ttk.Button(frame_human, text="清空", command=lambda: self.human_overrides_var.set("")).pack(side="left", padx=3)
 
         # --- 运行按钮 ---
-        self.btn_run = ttk.Button(tab_run, text="▶ 运行所选案件", command=self._on_run)
-        self.btn_run.pack(pady=5)
+        self.btn_run = ttk.Button(tab_run, text="▶  运行所选案件", command=self._on_run, style="Primary.TButton")
+        self.btn_run.pack(pady=6)
 
         # --- 进度日志 ---
         frame_log = ttk.LabelFrame(tab_run, text="运行日志", padding=5)
-        frame_log.pack(fill="both", expand=True, padx=10, pady=5)
+        frame_log.pack(fill="both", expand=True, padx=10, pady=(4, 8))
 
         self.log_text = tk.Text(frame_log, wrap="word", font=("Consolas", 9))
         scrollbar = ttk.Scrollbar(frame_log, orient="vertical", command=self.log_text.yview)
@@ -5102,7 +5156,7 @@ class BossAgentGUI:
         ttk.Entry(frame_llm, textvariable=self.local_audit_model_var, width=48).grid(row=5, column=1, sticky="we", pady=3)
         ttk.Label(frame_llm, text="本地LLM设备:").grid(row=6, column=0, sticky="e", pady=3)
         ttk.Combobox(frame_llm, textvariable=self.local_llm_device_var, values=["auto", "gpu", "cpu"], width=10, state="readonly").grid(row=6, column=1, sticky="w", pady=3)
-        ttk.Label(frame_llm, text="auto/gpu 会请求本地 Ollama 尽量使用显卡；不会自动切云端。", foreground="#666666").grid(row=7, column=1, sticky="w", pady=1)
+        ttk.Label(frame_llm, text="auto/gpu 会请求本地 Ollama 尽量使用显卡；不会自动切云端。", style="Hint.TLabel").grid(row=7, column=1, sticky="w", pady=1)
         ttk.Label(frame_llm, text="云端模型:").grid(row=8, column=0, sticky="e", pady=3)
         ttk.Entry(frame_llm, textvariable=self.cloud_chat_model_var, width=48).grid(row=8, column=1, sticky="we", pady=3)
         frame_llm.columnconfigure(1, weight=1)
@@ -5116,7 +5170,7 @@ class BossAgentGUI:
         ttk.Entry(frame_ocr, textvariable=self.ocr_engine_var, width=32).grid(row=3, column=1, sticky="w", pady=3)
         ttk.Label(frame_ocr, text="OCR设备:").grid(row=4, column=0, sticky="e", pady=3)
         ttk.Combobox(frame_ocr, textvariable=self.ocr_device_var, values=["auto", "gpu", "cpu"], width=10, state="readonly").grid(row=4, column=1, sticky="w", pady=3)
-        ttk.Label(frame_ocr, text="默认 auto/gpu 优先；GPU 不可用或初始化失败时转本地 CPU。", foreground="#666666").grid(row=5, column=1, sticky="w", pady=1)
+        ttk.Label(frame_ocr, text="默认 auto/gpu 优先；GPU 不可用或初始化失败时转本地 CPU。", style="Hint.TLabel").grid(row=5, column=1, sticky="w", pady=1)
         ttk.Label(frame_ocr, text="PDF渲染倍率:").grid(row=6, column=0, sticky="e", pady=3)
         ttk.Entry(frame_ocr, textvariable=self.ocr_render_scale_var, width=8).grid(row=6, column=1, sticky="w", pady=3)
         ttk.Checkbutton(frame_ocr, text="疑难页/图片二次OCR", variable=self.ocr_second_pass_var).grid(row=7, column=0, sticky="w", columnspan=2, pady=3)
@@ -5235,7 +5289,7 @@ class BossAgentGUI:
                 return session
             dialog = tk.Toplevel(self.root)
             dialog.title(session.get("title") or "审计前信息补充")
-            dialog.geometry("900x650")
+            _fit_window_to_screen(dialog, 900, 680, min_width=0, min_height=0)
             dialog.transient(self.root)
             dialog.grab_set()
             interaction_timer = ActiveInteractionTimer()
@@ -5326,8 +5380,7 @@ class BossAgentGUI:
 
             dialog = tk.Toplevel(self.root)
             dialog.title(updated_session.get("title") or "关节活动度｜量角器图片预审")
-            dialog.geometry("1280x860")
-            dialog.minsize(1080, 720)
+            _fit_window_to_screen(dialog, 1240, 820, min_width=1080, min_height=720)
             dialog.transient(self.root)
             dialog.grab_set()
             interaction_timer = ActiveInteractionTimer()
@@ -5665,7 +5718,7 @@ class BossAgentGUI:
 
             dialog = tk.Toplevel(self.root)
             dialog.title("人工审计确认")
-            dialog.geometry("980x720")
+            _fit_window_to_screen(dialog, 980, 720, min_width=0, min_height=0)
             dialog.transient(self.root)
             dialog.grab_set()
             interaction_timer = ActiveInteractionTimer()
@@ -6052,7 +6105,7 @@ class BossAgentGUI:
         def show_dialog() -> Tuple[str, dict]:
             dialog = tk.Toplevel(self.root)
             dialog.title("最终报告预览与小修")
-            dialog.geometry("1000x760")
+            _fit_window_to_screen(dialog, 1000, 760, min_width=0, min_height=0)
             dialog.transient(self.root)
             dialog.grab_set()
             interaction_timer = ActiveInteractionTimer()
