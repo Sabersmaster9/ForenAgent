@@ -74,6 +74,12 @@ def _resolve_output_path(selected_folder: str) -> str:
     return os.path.join(case_dir, "extracted_result.md")
 
 
+# 扫描材料时跳过的目录名。
+# "输出" 是 ForenAgent 的交付目录，_work 是其过程文件目录——重跑时若不跳过，
+# 上一轮的鉴定意见书和阶段 JSON 会被当成案件材料重新 OCR，污染事实抽取。
+EXCLUDED_SCAN_DIRS = {"输出", "_work", "visual_overlays", "__pycache__", ".git", ".venv"}
+
+
 def _collect_case_files(scan_root: str) -> List[str]:
     """递归收集案件内可解析文件，过滤临时文件。"""
     supported_extensions = ('.pdf', '.docx', '.doc', '.png', '.jpg', '.jpeg', '.tif', '.tiff', '.txt', '.md', '.csv', '.json')
@@ -83,10 +89,18 @@ def _collect_case_files(scan_root: str) -> List[str]:
         all_files.extend(glob.glob(os.path.join(scan_root, "**", f"*{ext}"), recursive=True))
         all_files.extend(glob.glob(os.path.join(scan_root, "**", f"*{ext.upper()}"), recursive=True))
 
+    def _is_excluded(path: str) -> bool:
+        try:
+            rel_parts = os.path.relpath(path, scan_root).split(os.sep)
+        except ValueError:
+            return False
+        # 只看相对 scan_root 的路径分量，避免父目录恰好叫"输出"时误伤。
+        return any(part in EXCLUDED_SCAN_DIRS for part in rel_parts[:-1])
+
     # 过滤 Office 临时文件，比如 ~$xxx.docx
     cleaned_files = [
         f for f in all_files
-        if not os.path.basename(f).startswith("~$") and os.path.isfile(f)
+        if not os.path.basename(f).startswith("~$") and os.path.isfile(f) and not _is_excluded(f)
     ]
 
     # 排序后去重，保证输出顺序稳定，便于跨案例复核

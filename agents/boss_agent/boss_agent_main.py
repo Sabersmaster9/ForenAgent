@@ -96,6 +96,19 @@ JUDGE_INPUT_EXTENSIONS = {
 }
 
 STAGE_WORK_DIR = "_work"
+
+# ------------------------------------------------------------
+# 交付物：直接选文件夹模式（GUI 两步上传）下，鉴定人只看这三个文件。
+# 过程文件全部收在 <交付目录>/_work/，界面不展示，但保留以支持重跑与人工回填重放。
+# ------------------------------------------------------------
+DELIVERABLE_DIR_NAME = "输出"
+DELIVERABLE_REPORT_MD = "鉴定意见书.md"
+DELIVERABLE_REPORT_DOCX = "鉴定意见书.docx"
+DELIVERABLE_AUDIT_MD = "AI审计报告.md"
+DELIVERABLE_FILES = (DELIVERABLE_REPORT_MD, DELIVERABLE_REPORT_DOCX, DELIVERABLE_AUDIT_MD)
+
+# 材料夹里这些子目录是运行产物，不参与通道识别（其余按关键词识别检查记录/专家报告）。
+EXCLUDED_CASE_CHILD_DIRS = {DELIVERABLE_DIR_NAME, STAGE_WORK_DIR, "visual_overlays"}
 STAGE_EXTRACTOR_MD = "01_extractor.md"
 STAGE_STRUCTURING_JSON = "02_structuring.json"
 STAGE_STRUCTURING_MD = "02_structuring.md"
@@ -401,6 +414,36 @@ def resolve_case_channels(case_folder: str) -> Dict[str, Optional[str]]:
     }
 
 
+def resolve_direct_channels(
+    materials_folder: str,
+    photo_folder: Optional[str] = None,
+) -> Dict[str, Optional[str]]:
+    """直接选文件夹模式：所选的案件材料夹即案件材料。
+
+    第 4 部分「检验过程」的检查记录单独读取，取材料夹内按关键词命中的子目录
+    （如 `检查记录` / `损伤情况`）。目录不存在时返回 None，由 Judge 走结构化摘要，
+    而不是把整夹案件证据当成检查记录。
+    """
+    if not materials_folder or not os.path.isdir(materials_folder):
+        raise FileNotFoundError(f"案件材料文件夹不存在: {materials_folder}")
+
+    children = [
+        child for child in _child_dirs(materials_folder)
+        # 交付目录与过程目录是上一轮的产物，不是案件材料。
+        if os.path.basename(child) not in EXCLUDED_CASE_CHILD_DIRS
+    ]
+    exam_doc = _pick_folder(children, EXAM_DOC_FOLDER_KEYWORD_GROUPS)
+
+    return {
+        "case_folder": materials_folder,
+        "case_number": extract_case_number(materials_folder),
+        "materials_folder": materials_folder,
+        "exam_doc_folder": exam_doc,
+        "photo_folder": photo_folder,
+        "reference_report_folder": _pick_folder(children, REFERENCE_FOLDER_KEYWORD_GROUPS),
+    }
+
+
 def get_case_output_dir(
     case_folder: str,
     override: Optional[str] = None,
@@ -538,6 +581,76 @@ def _cleanup_public_output_dir(output_dir: str, protected_names: Optional[set] =
                 os.remove(path)
         except OSError:
             pass
+
+
+def resolve_deliverable_dir(materials_folder: str) -> str:
+    """直接选文件夹模式下的交付目录：<材料文件夹>/输出/。"""
+    if not materials_folder:
+        raise ValueError("请先选择案件材料文件夹。")
+    target = os.path.join(materials_folder, DELIVERABLE_DIR_NAME)
+    os.makedirs(target, exist_ok=True)
+    return target
+
+
+def _consolidate_work_files(deliverable_dir: str) -> None:
+    """把交付目录顶层的过程文件收进 _work/，只留三个交付物。
+
+    流水线各阶段把文件直接写在输出目录下，这里统一归拢，鉴定人打开"输出"
+    文件夹时看到的就只有意见书和审计报告。
+    """
+    work_dir = os.path.join(deliverable_dir, STAGE_WORK_DIR)
+    os.makedirs(work_dir, exist_ok=True)
+    for name in os.listdir(deliverable_dir):
+        if name in DELIVERABLE_FILES or name == STAGE_WORK_DIR:
+            continue
+        src = os.path.join(deliverable_dir, name)
+        dst = os.path.join(work_dir, name)
+        if os.path.exists(dst):
+            continue
+        try:
+            shutil.move(src, dst)
+        except OSError:
+            # 单个过程文件搬不动不该让交付失败。
+            pass
+
+
+def write_deliverables(
+    deliverable_dir: str,
+    reviewed_md: str,
+    audit_md: str,
+    log: Optional[Callable[[str], None]] = None,
+) -> Dict[str, str]:
+    """把最终成果写成鉴定人实际要用的三个文件。
+
+    过程文件（OCR 文本、各阶段 JSON、人工回填记录）留在 <交付目录>/_work/，
+    这里只产出交付物，不搬动过程文件。
+    """
+    if log is None:
+        log = print
+    os.makedirs(deliverable_dir, exist_ok=True)
+
+    # 先把过程文件收进 _work/，避免它们和交付物混在交付目录顶层。
+    _consolidate_work_files(deliverable_dir)
+
+    report_md_path = os.path.join(deliverable_dir, DELIVERABLE_REPORT_MD)
+    audit_md_path = os.path.join(deliverable_dir, DELIVERABLE_AUDIT_MD)
+    docx_path = os.path.join(deliverable_dir, DELIVERABLE_REPORT_DOCX)
+
+    with open(report_md_path, "w", encoding="utf-8") as f:
+        f.write(reviewed_md)
+    with open(audit_md_path, "w", encoding="utf-8") as f:
+        f.write(audit_md)
+
+    # Word 版式渲染失败不应让整条流水线失败：报告正文已经落地，docx 只是排版。
+    try:
+        from agents.boss_agent.docx_renderer import render_report_docx
+
+        render_report_docx(reviewed_md, docx_path)
+    except Exception as exc:  # noqa: BLE001
+        log(f"[WARN] Word 版式生成失败（正文 Markdown 已保存）：{type(exc).__name__}: {exc}")
+        docx_path = ""
+
+    return {"report_md": report_md_path, "audit_md": audit_md_path, "docx": docx_path}
 
 
 def _read_json(path: str) -> dict:
@@ -4420,15 +4533,37 @@ def run_pipeline(
     else:
         materials_folder = materials_folder or transfer_folder
         photo_folder = photo_folder or check_folder
+        if materials_folder and not transfer_folder:
+            # 直接选文件夹模式（GUI 第 1/2 步）：材料夹即案件材料，
+            # 检查记录取其中按关键词命中的子目录，而非把整夹都当检查记录。
+            direct = resolve_direct_channels(materials_folder, photo_folder)
+            exam_doc_folder = exam_doc_folder or direct.get("exam_doc_folder")
+            reference_report_folder = reference_report_folder or direct.get("reference_report_folder")
+            log(f"案件材料目录: {materials_folder}")
+            log(f"  检查记录子目录: {exam_doc_folder or '未发现，Judge 将使用结构化摘要/视觉结果'}")
+            log(f"  检查照片目录: {photo_folder or '未选择，跳过视觉'}")
+            if reference_report_folder:
+                log(f"  专家意见书子目录: {reference_report_folder}（仅评价用，不进入生成）")
 
     if not materials_folder:
         raise ValueError("请提供 case_folder，或提供 materials_folder/transfer_folder。")
 
-    # 确定输出目录：database 编号案件默认写入 `test_result/<编号>/`；旧双目录模式若能识别编号也写入对应编号目录。
+    # 确定输出目录。
+    # - case_folder（旧 mode）：database 编号案件写入 test_result/<编号>/；
+    # - 直接选文件夹（GUI 两步上传）：交付目录 <材料文件夹>/输出/，过程文件收进 输出/_work/；
+    # - 显式 --output-dir：沿用该目录，交付物也写在那里。
+    deliverable_dir: Optional[str] = None
     if case_folder:
         out = get_case_output_dir(case_folder, output_dir, batch_label=batch_label)
-    else:
+    elif output_dir:
         out = get_output_dir(materials_folder, output_dir, batch_label=batch_label)
+        deliverable_dir = out
+    else:
+        deliverable_dir = resolve_deliverable_dir(materials_folder)
+        # 过程文件与交付物同写在交付目录下，收尾时由 _consolidate_work_files
+        # 统一归入 输出/_work/。这样各阶段照常按 <输出目录>/_work/... 写文件，
+        # 不会多出一层嵌套的 _work。
+        out = deliverable_dir
     log(f"输出目录: {out}")
 
     if not report_date:
@@ -4744,6 +4879,17 @@ def run_pipeline(
         with open(audit_path, "w", encoding="utf-8") as f:
             f.write(audit_md)
 
+        # 交付模式：产出鉴定人实际要用的三个文件，过程文件留在 输出/_work/ 供重跑与回填重放。
+        if deliverable_dir:
+            deliverable_paths = write_deliverables(deliverable_dir, reviewed_md, audit_md, log=log)
+            log("=" * 50)
+            log(f"完成！交付目录: {deliverable_dir}")
+            log(f"  鉴定意见书(Word): {deliverable_paths.get('docx') or '（生成失败，见上方告警）'}")
+            log(f"  鉴定意见书(Markdown): {deliverable_paths['report_md']}")
+            log(f"  AI审计报告: {deliverable_paths['audit_md']}")
+            log("=" * 50)
+            return deliverable_paths["report_md"]
+
         # 成功后只保留公开 06 文件和必要阶段 JSON；过程 work/overlay 目录不进入 demo 输出。
         _delete_files(structuring_md, judge_md, ruler_md)
         _cleanup_transient_output_artifacts(out)
@@ -4776,8 +4922,16 @@ def run_case_batch(
     audit_callback: Optional[Callable[[dict, str], Optional[dict]]] = None,
     preview_callback: Optional[Callable[[str, str, Optional[dict]], Tuple[str, dict]]] = None,
     runtime_config: Optional[RuntimeConfig] = None,
+    materials_folder: Optional[str] = None,
+    photo_folder: Optional[str] = None,
 ) -> List[Dict[str, str]]:
-    """按顺序运行多个 database 案件，每案输出到 `test_result/<案件编号>/`。"""
+    """按顺序运行所选案件。
+
+    两种输入形态：
+    - 传入案件根目录（database/001 这类）：沿用旧的通道识别，输出到 test_result/<编号>/；
+    - 传入 materials_folder（GUI 两步上传的"案件材料文件夹"）：直接以该目录为材料，
+      交付物写进 <材料文件夹>/输出/。
+    """
     if log is None:
         log = print
     config = runtime_config or get_runtime_config()
@@ -4791,8 +4945,8 @@ def run_case_batch(
         log("\n" + "#" * 60)
         log(f"[批量 {index}/{total}] {case}")
         try:
-            final_path = run_pipeline(
-                case_folder=case,
+            # materials_folder 显式给出时走"直接选文件夹"模式，不再把 case 当案件根目录解析。
+            pipeline_kwargs: Dict[str, Any] = dict(
                 mode=mode,
                 report_date=report_date,
                 skip_visual=skip_visual,
@@ -4806,6 +4960,12 @@ def run_case_batch(
                 preview_callback=preview_callback,
                 runtime_config=config,
             )
+            if materials_folder:
+                pipeline_kwargs["materials_folder"] = materials_folder
+                pipeline_kwargs["photo_folder"] = photo_folder
+            else:
+                pipeline_kwargs["case_folder"] = case
+            final_path = run_pipeline(**pipeline_kwargs)
             results.append({"case_folder": case, "status": "success", "final_report": final_path, "error": ""})
         except Exception as exc:
             log(f"[批量 {index}/{total}] 失败: {exc}")
@@ -4828,7 +4988,9 @@ class BossAgentGUI:
         self.root.geometry("860x650")
         self.root.resizable(True, True)
 
-        self.selected_cases: List[str] = []
+        # 输入改为两步选文件夹：① 案件材料（必选）② 检查照片（可选）。
+        self.materials_var = tk.StringVar(value="")
+        self.photo_var = tk.StringVar(value="")
         self.mode_var = tk.StringVar(value="hybrid")
         self.skip_visual_var = tk.BooleanVar(value=False)
         self.human_overrides_var = tk.StringVar(value="")
@@ -4852,7 +5014,7 @@ class BossAgentGUI:
         self.batch_label: Optional[str] = None
 
         self._build_ui()
-        self.root.after(200, self._prompt_initial_case_selection)
+        self.root.after(200, self._prompt_initial_materials)
 
     def _build_ui(self):
         notebook = ttk.Notebook(self.root)
@@ -4862,22 +5024,33 @@ class BossAgentGUI:
         notebook.add(tab_run, text="案件运行")
         notebook.add(tab_model, text="模型调用")
 
-        # --- 案件选择区 ---
-        frame_cases = ttk.LabelFrame(tab_run, text="案件选择（可多选 database/001 等被鉴定人文件夹）", padding=10)
-        frame_cases.pack(fill="x", padx=10, pady=5)
+        # --- 输入区（两步）---
+        frame_input = ttk.LabelFrame(tab_run, text="案件输入", padding=10)
+        frame_input.pack(fill="x", padx=10, pady=5)
 
-        ttk.Button(frame_cases, text="选择案件文件夹（可多选）", command=self._browse_cases).pack(side="left")
-        ttk.Button(frame_cases, text="清空", command=self._clear_cases).pack(side="left", padx=6)
-        self.case_count_label = ttk.Label(frame_cases, text="未选择案件")
-        self.case_count_label.pack(side="left", padx=10)
+        row1 = ttk.Frame(frame_input)
+        row1.pack(fill="x")
+        ttk.Label(row1, text="第 1 步", width=7).pack(side="left")
+        ttk.Button(row1, text="选择案件材料文件夹", command=self._browse_materials).pack(side="left")
+        ttk.Entry(row1, textvariable=self.materials_var, state="readonly").pack(
+            side="left", fill="x", expand=True, padx=6
+        )
+        ttk.Label(row1, text="（必选）", foreground="#666666").pack(side="left")
 
-        frame_list = ttk.Frame(tab_run, padding=(10, 0, 10, 5))
-        frame_list.pack(fill="x")
-        self.case_listbox = tk.Listbox(frame_list, height=5)
-        list_scroll = ttk.Scrollbar(frame_list, orient="vertical", command=self.case_listbox.yview)
-        self.case_listbox.configure(yscrollcommand=list_scroll.set)
-        list_scroll.pack(side="right", fill="y")
-        self.case_listbox.pack(side="left", fill="x", expand=True)
+        row2 = ttk.Frame(frame_input)
+        row2.pack(fill="x", pady=(6, 0))
+        ttk.Label(row2, text="第 2 步", width=7).pack(side="left")
+        ttk.Button(row2, text="选择检查照片文件夹", command=self._browse_photos).pack(side="left")
+        ttk.Entry(row2, textvariable=self.photo_var, state="readonly").pack(
+            side="left", fill="x", expand=True, padx=6
+        )
+        ttk.Label(row2, text="（可选，没有可不选）", foreground="#666666").pack(side="left")
+
+        row3 = ttk.Frame(frame_input)
+        row3.pack(fill="x", pady=(8, 0))
+        ttk.Button(row3, text="清空", command=self._clear_inputs).pack(side="left")
+        self.input_status_label = ttk.Label(row3, text="尚未选择案件材料文件夹")
+        self.input_status_label.pack(side="left", padx=10)
 
         # --- 模式选择 ---
         frame_mode = ttk.Frame(tab_run, padding=5)
@@ -4958,111 +5131,61 @@ class BossAgentGUI:
         ttk.Checkbutton(frame_cloud, text="我确认允许本次将相关文本发送至云端 API", variable=self.allow_cloud_var).pack(anchor="w")
         ttk.Label(frame_cloud, text="默认本地运行；本地失败不会自动切换云端。", foreground="#aa5500").pack(anchor="w", pady=(6, 0))
 
-    def _prompt_initial_case_selection(self):
-        if not self.selected_cases:
-            self._browse_cases()
+    def _prompt_initial_materials(self):
+        if not self.materials_var.get().strip():
+            self._browse_materials()
 
-    def _browse_cases(self):
-        paths = self._ask_case_directories()
-        if not paths:
+    def _browse_materials(self):
+        """第 1 步：选择案件材料文件夹（案件证据文档所在目录）。"""
+        current = self.materials_var.get().strip()
+        initial = current if current and os.path.isdir(current) else (
+            DEFAULT_DATABASE_DIR if os.path.isdir(DEFAULT_DATABASE_DIR) else PROJECT_ROOT
+        )
+        folder = filedialog.askdirectory(
+            title="第 1 步：请选择案件材料文件夹（案件证据文档）",
+            initialdir=initial,
+            mustexist=True,
+        )
+        if not folder:
             return
-        for path in paths:
-            norm = os.path.abspath(path)
-            if norm not in self.selected_cases:
-                self.selected_cases.append(norm)
-        self._refresh_case_list()
+        self.materials_var.set(os.path.abspath(folder))
+        self._refresh_input_status()
 
-    def _ask_case_directories(self) -> List[str]:
-        """弹出自定义案件目录多选窗口。"""
-        initialdir = DEFAULT_DATABASE_DIR if os.path.isdir(DEFAULT_DATABASE_DIR) else PROJECT_ROOT
-        dialog = tk.Toplevel(self.root)
-        dialog.title("选择被鉴定人案件文件夹")
-        dialog.geometry("760x520")
-        dialog.transient(self.root)
-        dialog.grab_set()
+    def _browse_photos(self):
+        """第 2 步：选择检查照片文件夹（可跳过）。"""
+        current = self.photo_var.get().strip()
+        initial = current if current and os.path.isdir(current) else (
+            self.materials_var.get().strip()
+            or (DEFAULT_DATABASE_DIR if os.path.isdir(DEFAULT_DATABASE_DIR) else PROJECT_ROOT)
+        )
+        folder = filedialog.askdirectory(
+            title="第 2 步：请选择检查照片文件夹（没有可直接跳过）",
+            initialdir=initial,
+            mustexist=True,
+        )
+        if not folder:
+            return
+        self.photo_var.set(os.path.abspath(folder))
+        self._refresh_input_status()
 
-        parent_var = tk.StringVar(value=initialdir)
-        selected: List[str] = []
+    def _clear_inputs(self):
+        self.materials_var.set("")
+        self.photo_var.set("")
+        self._refresh_input_status()
 
-        frame_top = ttk.Frame(dialog, padding=8)
-        frame_top.pack(fill="x")
-        ttk.Label(frame_top, text="案件父目录:").pack(side="left")
-        ttk.Entry(frame_top, textvariable=parent_var).pack(side="left", fill="x", expand=True, padx=6)
-
-        list_frame = ttk.Frame(dialog, padding=(8, 0, 8, 8))
-        list_frame.pack(fill="both", expand=True)
-        listbox = tk.Listbox(list_frame, selectmode="extended", font=("Microsoft YaHei UI", 9))
-        scrollbar = ttk.Scrollbar(list_frame, orient="vertical", command=listbox.yview)
-        listbox.configure(yscrollcommand=scrollbar.set)
-        scrollbar.pack(side="right", fill="y")
-        listbox.pack(side="left", fill="both", expand=True)
-
-        status_var = tk.StringVar()
-        ttk.Label(dialog, textvariable=status_var, padding=(8, 0, 8, 4)).pack(fill="x")
-
-        displayed: List[str] = []
-
-        def refresh_list():
-            displayed.clear()
-            listbox.delete(0, "end")
-            parent = parent_var.get().strip()
-            if not parent or not os.path.isdir(parent):
-                status_var.set("父目录不存在。")
-                return
-            for child in _child_dirs(parent):
-                try:
-                    channels = resolve_case_channels(child)
-                    label = os.path.basename(child)
-                    suffix = []
-                    if channels.get("materials_folder"):
-                        suffix.append("材料")
-                    if channels.get("photo_folder"):
-                        suffix.append("照片")
-                    if channels.get("reference_report_folder"):
-                        suffix.append("专家参考")
-                    if channels.get("output_base_folder"):
-                        suffix.append("输出")
-                    listbox.insert("end", f"{label}    [{' / '.join(suffix)}]")
-                    displayed.append(child)
-                except Exception:
-                    continue
-            status_var.set(f"发现 {len(displayed)} 个可识别案件目录；可按 Ctrl/Shift 多选。")
-
-        def choose_parent():
-            folder = filedialog.askdirectory(title="选择包含多个案件文件夹的父目录", initialdir=parent_var.get() or PROJECT_ROOT, mustexist=True)
-            if folder:
-                parent_var.set(folder)
-                refresh_list()
-
-        def choose_single_folder():
-            folder = filedialog.askdirectory(title="直接选择一个案件文件夹", initialdir=parent_var.get() or PROJECT_ROOT, mustexist=True)
-            if folder:
-                selected.clear()
-                selected.append(folder)
-                dialog.destroy()
-
-        def confirm():
-            selected.clear()
-            for idx in listbox.curselection():
-                selected.append(displayed[idx])
-            dialog.destroy()
-
-        def cancel():
-            selected.clear()
-            dialog.destroy()
-
-        ttk.Button(frame_top, text="更换父目录", command=choose_parent).pack(side="left", padx=4)
-        ttk.Button(frame_top, text="直接选择单个案件", command=choose_single_folder).pack(side="left", padx=4)
-
-        frame_bottom = ttk.Frame(dialog, padding=8)
-        frame_bottom.pack(fill="x")
-        ttk.Button(frame_bottom, text="确定", command=confirm).pack(side="right", padx=4)
-        ttk.Button(frame_bottom, text="取消", command=cancel).pack(side="right", padx=4)
-        ttk.Button(frame_bottom, text="刷新", command=refresh_list).pack(side="left", padx=4)
-
-        refresh_list()
-        self.root.wait_window(dialog)
-        return selected
+    def _refresh_input_status(self):
+        materials = self.materials_var.get().strip()
+        photos = self.photo_var.get().strip()
+        if not materials:
+            self.input_status_label.configure(text="尚未选择案件材料文件夹")
+            return
+        try:
+            count = _count_material_files(materials)
+        except Exception:
+            count = 0
+        parts = [f"材料：{count} 个文件"]
+        parts.append(f"照片：{'已选择' if photos else '未选择（跳过视觉）'}")
+        self.input_status_label.configure(text="；".join(parts))
 
     def _browse_human_overrides(self):
         path = filedialog.askopenfilename(
@@ -5072,17 +5195,6 @@ class BossAgentGUI:
         )
         if path:
             self.human_overrides_var.set(path)
-
-    def _clear_cases(self):
-        self.selected_cases.clear()
-        self._refresh_case_list()
-
-    def _refresh_case_list(self):
-        self.case_listbox.delete(0, "end")
-        for case in self.selected_cases:
-            self.case_listbox.insert("end", case)
-        count = len(self.selected_cases)
-        self.case_count_label.configure(text=f"已选择 {count} 个案件" if count else "未选择案件")
 
     def _log(self, msg: str):
         """线程安全的日志输出。"""
@@ -6129,8 +6241,16 @@ class BossAgentGUI:
     def _on_run(self):
         if self.running:
             return
-        if not self.selected_cases:
-            messagebox.showwarning("提示", "请先选择至少一个被鉴定人案件文件夹")
+        materials_folder = self.materials_var.get().strip()
+        if not materials_folder:
+            messagebox.showwarning("提示", "请先完成第 1 步：选择案件材料文件夹")
+            return
+        if not os.path.isdir(materials_folder):
+            messagebox.showwarning("提示", f"案件材料文件夹不存在：\n{materials_folder}")
+            return
+        photo_folder = self.photo_var.get().strip() or None
+        if photo_folder and not os.path.isdir(photo_folder):
+            messagebox.showwarning("提示", f"检查照片文件夹不存在：\n{photo_folder}")
             return
         self.running = True
         self.btn_run.configure(state="disabled")
@@ -6138,7 +6258,8 @@ class BossAgentGUI:
         self.btn_review.configure(state="disabled")
         self.log_text.delete("1.0", "end")
 
-        selected_cases = list(self.selected_cases)
+        # 检查照片是第 2 步的可选项；没选就跳过 Visual，而不是去材料夹里乱猜。
+        skip_visual = self.skip_visual_var.get() or not photo_folder
         human_overrides_path = self.human_overrides_var.get().strip() or None
         if human_overrides_path and not os.path.isfile(human_overrides_path):
             messagebox.showwarning("提示", "人工补充事实 JSON 不存在，请重新选择或清空。")
@@ -6158,9 +6279,9 @@ class BossAgentGUI:
         def worker():
             try:
                 results = run_case_batch(
-                    selected_cases,
+                    [materials_folder],
                     mode=self.mode_var.get(),
-                    skip_visual=self.skip_visual_var.get(),
+                    skip_visual=skip_visual,
                     log=self._log,
                     batch_label=batch_label,
                     human_overrides_path=human_overrides_path,
@@ -6169,12 +6290,14 @@ class BossAgentGUI:
                     audit_callback=self._audit_questions_dialog,
                     preview_callback=self._preview_report_dialog,
                     runtime_config=runtime_config,
+                    materials_folder=materials_folder,
+                    photo_folder=photo_folder,
                 )
                 successful = [r for r in results if r.get("final_report")]
                 if successful:
                     self.last_output_dir = os.path.dirname(successful[-1]["final_report"])
-                    review_path = os.path.join(self.last_output_dir, FINAL_AUDIT_MD)
-                    self.last_review_path = review_path if os.path.isfile(review_path) else None
+                    report_path = os.path.join(self.last_output_dir, DELIVERABLE_REPORT_MD)
+                    self.last_review_path = report_path if os.path.isfile(report_path) else None
                     self.root.after(0, lambda: self.btn_open.configure(state="normal"))
                     if self.last_review_path:
                         self.root.after(0, lambda: self.btn_review.configure(state="normal"))
@@ -6215,6 +6338,7 @@ def main():
     _maybe_reexec_with_preferred_python(["paddleocr", "pydantic", "langchain_openai", "langchain_core", "openai"])
     parser = argparse.ArgumentParser(description="boss_agent — 鉴定意见书总控流水线")
     parser.add_argument("--case-folder", action="append", help="案件根目录，可重复传入多个；自动读取 1鉴定材料/3检查照片，输出到 test_result/<编号>")
+    parser.add_argument("--materials-folder", help="案件材料文件夹（GUI 第 1 步所选）；交付物写入 <该文件夹>/输出/")
     parser.add_argument("--case-folders", nargs="+", help="多个案件根目录（批量CLI模式）")
     parser.add_argument("--transfer-folder", help="移交/证据材料文件夹路径（兼容旧模式）")
     parser.add_argument("--check-folder", help="检查照片文件夹路径（兼容旧模式，作为 photo_folder 使用）")
@@ -6292,6 +6416,17 @@ def main():
                 ignore_saved_overrides=args.ignore_saved_overrides,
                 runtime_config=runtime_config,
             )
+        elif args.materials_folder:
+            run_pipeline(
+                materials_folder=args.materials_folder,
+                photo_folder=args.photo_folder,
+                mode=args.mode,
+                skip_visual=args.skip_visual,
+                exam_doc_folder=args.exam_doc_folder,
+                human_overrides_path=args.human_overrides,
+                ignore_saved_overrides=args.ignore_saved_overrides,
+                runtime_config=runtime_config,
+            )
         elif args.transfer_folder:
             run_pipeline(
                 transfer_folder=args.transfer_folder,
@@ -6309,11 +6444,10 @@ def main():
             parser.error("--no-gui 模式请提供 --case-folder/--case-folders，或至少提供 --transfer-folder。")
     else:
         gui = BossAgentGUI()
-        for case in case_folders:
-            norm = os.path.abspath(case)
-            if norm not in gui.selected_cases:
-                gui.selected_cases.append(norm)
-        gui._refresh_case_list()
+        # 命令行给定案件目录时预填（兼容旧习惯）；否则由 GUI 第 1 步选择。
+        if case_folders:
+            gui.materials_var.set(os.path.abspath(case_folders[0]))
+            gui._refresh_input_status()
         gui.run()
 
 
