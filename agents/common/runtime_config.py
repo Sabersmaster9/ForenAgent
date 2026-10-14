@@ -18,6 +18,16 @@ LOCAL_OCR_REC_MODEL = "PP-OCRv5_mobile_rec"
 LOCAL_OCR_RENDER_SCALE = 1.5
 LOCAL_OCR_SECOND_PASS_SCALE = 2.5
 
+# 模型/缓存根目录。默认放在程序目录下的 models/cache/，这样整个项目拷到
+# 另一台机器（离线部署）时缓存跟着走，不必在新机器上重新下载。
+# 仍可用 FORENAGENT_MODEL_CACHE_DIR 或各自的 PADDLE*_HOME 环境变量覆盖。
+_PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+MODEL_CACHE_ROOT = os.getenv("FORENAGENT_MODEL_CACHE_DIR") or os.path.join(_PROJECT_ROOT, "models", "cache")
+DEFAULT_PADDLE_PDX_CACHE_HOME = os.path.join(MODEL_CACHE_ROOT, "paddlex")
+DEFAULT_PADDLEOCR_HOME = os.path.join(MODEL_CACHE_ROOT, "paddleocr")
+DEFAULT_PADDLE_HOME = os.path.join(MODEL_CACHE_ROOT, "paddle")
+DEFAULT_XDG_CACHE_HOME = os.path.join(MODEL_CACHE_ROOT, "xdg")
+
 
 _TRUE_VALUES = {"1", "true", "yes", "y", "on", "是", "允许"}
 
@@ -84,10 +94,10 @@ class RuntimeConfig:
     local_ocr_use_doc_orientation: bool = False
     local_ocr_use_doc_unwarping: bool = False
     local_ocr_use_textline_orientation: bool = False
-    paddle_pdx_cache_home: str = r"D:\models\paddlex"
-    paddleocr_home: str = r"D:\models\paddleocr"
-    paddle_home: str = r"D:\models\paddle"
-    xdg_cache_home: str = r"D:\models\cache"
+    paddle_pdx_cache_home: str = DEFAULT_PADDLE_PDX_CACHE_HOME
+    paddleocr_home: str = DEFAULT_PADDLEOCR_HOME
+    paddle_home: str = DEFAULT_PADDLE_HOME
+    xdg_cache_home: str = DEFAULT_XDG_CACHE_HOME
 
     @classmethod
     def from_env(cls) -> "RuntimeConfig":
@@ -118,10 +128,10 @@ class RuntimeConfig:
             local_ocr_use_doc_orientation=env_bool("FORENAGENT_LOCAL_OCR_USE_DOC_ORIENTATION", False),
             local_ocr_use_doc_unwarping=env_bool("FORENAGENT_LOCAL_OCR_USE_DOC_UNWARPING", False),
             local_ocr_use_textline_orientation=env_bool("FORENAGENT_LOCAL_OCR_USE_TEXTLINE_ORIENTATION", False),
-            paddle_pdx_cache_home=os.getenv("PADDLE_PDX_CACHE_HOME", r"D:\models\paddlex"),
-            paddleocr_home=os.getenv("PADDLEOCR_HOME", r"D:\models\paddleocr"),
-            paddle_home=os.getenv("PADDLE_HOME", r"D:\models\paddle"),
-            xdg_cache_home=os.getenv("XDG_CACHE_HOME", r"D:\models\cache"),
+            paddle_pdx_cache_home=os.getenv("PADDLE_PDX_CACHE_HOME", DEFAULT_PADDLE_PDX_CACHE_HOME),
+            paddleocr_home=os.getenv("PADDLEOCR_HOME", DEFAULT_PADDLEOCR_HOME),
+            paddle_home=os.getenv("PADDLE_HOME", DEFAULT_PADDLE_HOME),
+            xdg_cache_home=os.getenv("XDG_CACHE_HOME", DEFAULT_XDG_CACHE_HOME),
         )
 
     def with_overrides(self, **kwargs) -> "RuntimeConfig":

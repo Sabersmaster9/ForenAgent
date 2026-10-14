@@ -32,7 +32,12 @@ if PROJECT_ROOT not in sys.path:
 from agents.boss_agent.consistency_gate import validate_report_consistency
 from agents.common.llm_client import append_local_prompt_if_needed, call_chat_json
 from agents.common.output_paths import DEFAULT_TEST_RESULT_DIR, extract_case_number, resolve_numbered_output_dir
-from agents.common.runtime_config import RuntimeConfig, apply_runtime_env, get_runtime_config
+from agents.common.runtime_config import (
+    DEFAULT_PADDLE_PDX_CACHE_HOME as DEFAULT_PADDLE_CACHE_DIR,
+    RuntimeConfig,
+    apply_runtime_env,
+    get_runtime_config,
+)
 
 ENV_PATH = os.path.join(PROJECT_ROOT, ".env")
 load_dotenv(dotenv_path=ENV_PATH, override=True)
@@ -40,7 +45,23 @@ load_dotenv(dotenv_path=ENV_PATH, override=True)
 # 项目历史运行环境。Python 3.14/mingw 环境缺少 pydantic-core 预编译轮子，
 # 会导致云端 OCR/Structuring 依赖无法安装；若用户误用该 .venv 启动 Boss，
 # 自动重启到已配置的 forenagent conda 解释器，保证端到端命令可直接运行。
-PREFERRED_PYTHON = os.getenv("FORENAGENT_PYTHON", "D:/CondaData/envs/forenagent/python.exe")
+def _resolve_preferred_python() -> str:
+    """定位用于运行本程序的解释器。
+
+    优先级：FORENAGENT_PYTHON 环境变量 → 开发机历史环境 → 当前解释器。
+    部署到鉴定中心的机器时，下面那个 D:\\ 路径必然不存在；若不做回退，
+    Boss 会尝试重启到不存在的解释器而直接崩掉。
+    """
+    env_python = os.getenv("FORENAGENT_PYTHON")
+    if env_python and os.path.isfile(env_python):
+        return env_python
+    legacy = "D:/CondaData/envs/forenagent/python.exe"
+    if os.path.isfile(legacy):
+        return legacy
+    return sys.executable
+
+
+PREFERRED_PYTHON = _resolve_preferred_python()
 AUTO_REEXEC_ENV = "FORENAGENT_BOSS_REEXECED"
 
 # SiliconFlow LLM 配置
@@ -5176,7 +5197,7 @@ class BossAgentGUI:
         ttk.Checkbutton(frame_ocr, text="疑难页/图片二次OCR", variable=self.ocr_second_pass_var).grid(row=7, column=0, sticky="w", columnspan=2, pady=3)
         ttk.Label(frame_ocr, text="二次倍率:").grid(row=8, column=0, sticky="e", pady=3)
         ttk.Entry(frame_ocr, textvariable=self.ocr_second_pass_scale_var, width=8).grid(row=8, column=1, sticky="w", pady=3)
-        cache_home = os.getenv("PADDLE_PDX_CACHE_HOME", "D:/models/paddlex")
+        cache_home = os.getenv("PADDLE_PDX_CACHE_HOME", DEFAULT_PADDLE_CACHE_DIR)
         ttk.Label(frame_ocr, text=f"模型/缓存目录：{cache_home}").grid(row=9, column=0, sticky="w", columnspan=2, pady=3)
         ttk.Label(frame_ocr, text="默认模型：PP-OCRv5_mobile_det + PP-OCRv5_mobile_rec").grid(row=10, column=0, sticky="w", columnspan=2, pady=3)
 
