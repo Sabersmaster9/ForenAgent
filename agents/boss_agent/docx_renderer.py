@@ -20,37 +20,55 @@ from docx.shared import Cm, Pt
 
 
 # ============================================================
-# STYLE —— 司法文书版式（如需贴合鉴定中心模板，只改这一段）
+# STYLE —— 实测自鉴定中心真实意见书（files/知识库/格式示例/017.docx、018.docx）
+#
+# 两份样本的页面与段落参数完全一致，下列数值为逐段提取所得。
+# 鉴定中心若改模板，改这一段即可，不必动渲染逻辑。
 # ============================================================
 
-TITLE_FONT = "方正小标宋简体"   # 文书名（司法鉴定意见书）
-TITLE_SIZE_PT = 22.0            # 二号
-TITLE_LINES = ("司法鉴定意见书",)  # 视为大标题的行；其余抬头行走 CENTER/DOC_NO
+# 页面：A4，上下左右边距按实测值（不是党政公文那套 3.7/3.5/2.8/2.6）
+PAGE_WIDTH_CM = 21.0
+PAGE_HEIGHT_CM = 29.7
+MARGIN_TOP_CM = 2.5
+MARGIN_BOTTOM_CM = 2.0
+MARGIN_LEFT_CM = 2.5
+MARGIN_RIGHT_CM = 2.0
+HEADER_DISTANCE_CM = 1.5
+FOOTER_DISTANCE_CM = 1.75
 
-CENTER_FONT = "方正小标宋简体"   # 抬头第一行（鉴定中心名）
-CENTER_SIZE_PT = 22.0
+# 抬头：中心名 + 文书名，黑体二号的一半是 18pt（样本实测 18pt）
+CENTER_FONT = "黑体"
+CENTER_SIZE_PT = 18.0
+TITLE_FONT = "黑体"
+TITLE_SIZE_PT = 18.0
+TITLE_LINES = ("司法鉴定意见书",)
 
-DOC_NO_FONT = "仿宋_GB2312"
-DOC_NO_SIZE_PT = 16.0           # 三号
+# 文号：宋体 10.5pt，右对齐
+DOC_NO_FONT = "宋体"
+DOC_NO_SIZE_PT = 10.5
 
-HEADING1_FONT = "黑体"          # 一、基本情况
+# 一级标题（一、基本情况）：黑体 16pt
+HEADING1_FONT = "黑体"
 HEADING1_SIZE_PT = 16.0
-HEADING2_FONT = "楷体_GB2312"   # （一）检验方法
-HEADING2_SIZE_PT = 16.0
 
+# 二级标题（（一）检验方法）：样本里与正文同字体同字号，不做加粗区分
+HEADING2_FONT = "仿宋_GB2312"
+HEADING2_SIZE_PT = 14.0
+
+# 「一、基本情况」内的标签行（委托人：/受理日期：/被鉴定人：…）用黑体
+LABEL_FONT = "黑体"
+LABEL_SIZE_PT = 14.0
+LABEL_RE = re.compile(
+    r"^\s*(?:委托人|委托鉴定事项|受理日期|鉴定材料|鉴定地点|在场人员|被鉴定人|送检人)\s*[：:]"
+)
+
+# 正文：仿宋_GB2312 14pt
 BODY_FONT = "仿宋_GB2312"
-BODY_SIZE_PT = 16.0             # 三号
+BODY_SIZE_PT = 14.0
 BODY_BOLD = False
 
-LINE_SPACING_PT = 28.0          # 固定行距
-FIRST_LINE_INDENT_CHARS = 2     # 首行缩进字符数
-
-PAGE_WIDTH_CM = 21.0            # A4
-PAGE_HEIGHT_CM = 29.7
-MARGIN_TOP_CM = 3.7
-MARGIN_BOTTOM_CM = 3.5
-MARGIN_LEFT_CM = 2.8
-MARGIN_RIGHT_CM = 2.6
+LINE_SPACING_PT = 25.0          # 固定行距（样本实测）
+FIRST_LINE_INDENT_CHARS = 2     # 首行缩进 2 字符；样本里 14pt 正文为 28pt，一致
 
 # ============================================================
 
@@ -75,8 +93,12 @@ def _set_run_font(run, font_name: str, size_pt: float, bold: bool = False) -> No
         rfonts.set(qn(attr), font_name)
 
 
-def _set_first_line_indent_chars(paragraph, chars: int) -> None:
-    """按"字符"设置首行缩进（w:firstLineChars），字号变化时缩进会跟着走。"""
+def _set_first_line_indent_chars(paragraph, chars: int, size_pt: float) -> None:
+    """按"字符"设置首行缩进，与真实样本一致。
+
+    样本同时写了 w:firstLineChars（Word 按字号换算）和 w:firstLine（磅值兜底），
+    后者用于不识别字符缩进的旧阅读器。两者都写，避免打开位置不一致。
+    """
     if chars <= 0:
         return
     pf = paragraph._p.get_or_add_pPr()
@@ -85,6 +107,7 @@ def _set_first_line_indent_chars(paragraph, chars: int) -> None:
         ind = OxmlElement("w:ind")
         pf.append(ind)
     ind.set(qn("w:firstLineChars"), str(int(chars * 100)))
+    ind.set(qn("w:firstLine"), str(int(chars * size_pt * 20)))  # twips = 磅 × 20
 
 
 def _add_paragraph(
@@ -107,7 +130,7 @@ def _add_paragraph(
     paragraph.paragraph_format.first_line_indent = Pt(0)
     if align is not None:
         paragraph.alignment = align
-    _set_first_line_indent_chars(paragraph, indent_chars)
+    _set_first_line_indent_chars(paragraph, indent_chars, size_pt)
     run = paragraph.add_run(text)
     _set_run_font(run, font_name, size_pt, bold=bold)
 
@@ -148,6 +171,10 @@ def classify_lines(report_text: str) -> List[Tuple[str, str]]:
             continue
         if _HEADING2_RE.match(text):
             classified.append(("heading2", text))
+            continue
+        if LABEL_RE.match(text):
+            # 「一、基本情况」里的标签行在样本中用黑体，与正文仿宋区分。
+            classified.append(("label", text))
             continue
         role = "numbered" if _NUMBERED_RE.match(text) else "body"
         classified.append((role, text))
@@ -203,12 +230,22 @@ def render_report_docx(
                 align=WD_ALIGN_PARAGRAPH.CENTER, space_before_pt=12.0,
             )
         elif role == "heading1":
+            # 样本里一级标题同样是首行缩进 2 字符（16pt×2 = 32pt）
             _add_paragraph(
                 doc, text, HEADING1_FONT, HEADING1_SIZE_PT,
+                indent_chars=FIRST_LINE_INDENT_CHARS,
                 space_before_pt=12.0 if pending_blank else 6.0,
             )
         elif role == "heading2":
-            _add_paragraph(doc, text, HEADING2_FONT, HEADING2_SIZE_PT, space_before_pt=6.0)
+            _add_paragraph(
+                doc, text, HEADING2_FONT, HEADING2_SIZE_PT,
+                indent_chars=FIRST_LINE_INDENT_CHARS,
+            )
+        elif role == "label":
+            _add_paragraph(
+                doc, text, LABEL_FONT, LABEL_SIZE_PT,
+                indent_chars=FIRST_LINE_INDENT_CHARS,
+            )
         else:
             _add_paragraph(
                 doc, text, BODY_FONT, BODY_SIZE_PT,
