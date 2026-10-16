@@ -1,0 +1,20 @@
+{
+  "schema_version": "forenagent_human_overrides_v1",
+  "instructions": "合成实施例：鉴定人依据检查记录与量角器照片确认左膝关节活动度。仅回填事实，伤残等级仍由规则引擎裁决。",
+  "fact_overrides": [
+    {
+      "target": "section4.structured_rom",
+      "target_json": "judge",
+      "value_type": "object_merge",
+      "value": {
+        "膝关节": {
+          "左": { "屈曲": 95.0, "伸展": -10.0 },
+          "右": { "屈曲": 135.0, "伸展": 0.0 }
+        }
+      },
+      "apply": true,
+      "operator": "authorized_reviewer",
+      "evidence_note": "依据本次检查量角器照片与检查记录复核"
+    }
+  ]
+}

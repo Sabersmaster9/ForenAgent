@@ -331,9 +331,13 @@ def _amputation_period_from_facts(facts: RulerFacts) -> List[Dict[str, Any]]:
 
 def _eye_period_from_facts(facts: RulerFacts) -> List[Dict[str, Any]]:
     rf = facts.rule_features
-    if rf.get("eyeball_missing_or_removed"):
+    # 眼部字段在无证据时的取值是「不详」等占位字符串，必须经 _truthy 判定，
+    # 否则「未知」会被当作「存在」，把材料未提供写成确诊视力损害。
+    if _truthy(rf.get("eyeball_missing_or_removed")):
         return [_period_item("5.1.12", "眼球摘除", {"误工": [30, 60], "护理": [15, 20], "营养": [15, 20]}, "已识别眼球摘除/缺失。", "forensic_facts.eye_facts")]
-    if rf.get("blindness_level_one_eye") or rf.get("moderate_visual_impairment_one_eye") or rf.get("severe_visual_impairment_one_eye"):
+    if (_truthy(rf.get("blindness_level_one_eye"))
+            or _truthy(rf.get("moderate_visual_impairment_one_eye"))
+            or _truthy(rf.get("severe_visual_impairment_one_eye"))):
         return [_period_item("5.1.11", "视神经损伤/视觉功能障碍", {"误工": [90, 120], "护理": [30, 45], "营养": [30, 45]}, "已识别视力/视野功能损害。", "forensic_facts.eye_facts")]
     return []
 

@@ -80,9 +80,9 @@ class RuntimeConfig:
     local_llm_timeout: int = 240
     local_llm_max_tokens: int = 1800
     local_llm_context_chars: int = 9000
-    local_llm_device: str = "gpu"
+    local_llm_device: str = "auto"
     local_ocr_engine: str = LOCAL_OCR_ENGINE
-    local_ocr_device: str = "gpu"
+    local_ocr_device: str = "auto"
     local_ocr_det_model: str = LOCAL_OCR_DET_MODEL
     local_ocr_rec_model: str = LOCAL_OCR_REC_MODEL
     local_ocr_cpu_threads: int = 2
@@ -114,9 +114,9 @@ class RuntimeConfig:
             local_llm_timeout=int(os.getenv("FORENAGENT_LOCAL_LLM_TIMEOUT", "240") or 240),
             local_llm_max_tokens=int(os.getenv("FORENAGENT_LOCAL_LLM_MAX_TOKENS", "1800") or 1800),
             local_llm_context_chars=int(os.getenv("FORENAGENT_LOCAL_LLM_CONTEXT_CHARS", "9000") or 9000),
-            local_llm_device=_norm_device(os.getenv("FORENAGENT_LOCAL_LLM_DEVICE"), "gpu"),
+            local_llm_device=_norm_device(os.getenv("FORENAGENT_LOCAL_LLM_DEVICE"), "auto"),
             local_ocr_engine=os.getenv("FORENAGENT_LOCAL_OCR_ENGINE", LOCAL_OCR_ENGINE),
-            local_ocr_device=_norm_device(os.getenv("FORENAGENT_LOCAL_OCR_DEVICE"), "gpu"),
+            local_ocr_device=_norm_device(os.getenv("FORENAGENT_LOCAL_OCR_DEVICE"), "auto"),
             local_ocr_det_model=os.getenv("FORENAGENT_LOCAL_OCR_DET_MODEL", LOCAL_OCR_DET_MODEL),
             local_ocr_rec_model=os.getenv("FORENAGENT_LOCAL_OCR_REC_MODEL", LOCAL_OCR_REC_MODEL),
             local_ocr_cpu_threads=int(os.getenv("FORENAGENT_LOCAL_OCR_CPU_THREADS", "2") or 2),

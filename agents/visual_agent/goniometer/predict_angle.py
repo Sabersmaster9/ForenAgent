@@ -184,6 +184,115 @@ def candidate_angle_diff(a, b):
     return min(angle_between(a, b), angle_between(a, -b))
 
 
+# --- 量角器弧线几何 -------------------------------------------------------
+# 量角器刻度外缘是一段以轴心为圆心的圆弧；透视投影后成为椭圆。取该外轮廓
+# 在若干距离窗口内的点集可得到一份与掩膜拟合相互独立的固定臂方向估计，
+# 两者之差即弧线几何给出的透视修正量。窗口划分与离线实验保持一致。
+
+ARC_WINDOWS = {
+    "outer_70_100": (0.70, 1.00),
+    "outer_55_100": (0.55, 1.00),
+    "mid_35_80": (0.35, 0.80),
+    "round_45_95": (0.45, 0.95),
+}
+
+
+def contour_points(mask):
+    mask_u8 = (mask > 0).astype(np.uint8) * 255
+    contours, _ = cv2.findContours(mask_u8, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    if not contours:
+        return None
+    contour = max(contours, key=cv2.contourArea)
+    if len(contour) < 20:
+        return None
+    return contour.reshape(-1, 2).astype(np.float32)
+
+
+def arc_direction_candidates(mask, pivot):
+    """按量角器外轮廓在多个距离窗口内拟合固定臂方向候选。"""
+    pts = contour_points(mask)
+    if pts is None or pivot is None:
+        return {}
+    dists = np.linalg.norm(pts - pivot[None, :], axis=1)
+    if len(dists) < 20 or float(dists.max()) <= 1.0:
+        return {}
+    max_dist = float(np.percentile(dists, 98))
+    out = {}
+    for name, (low, high) in ARC_WINDOWS.items():
+        keep = (dists >= max_dist * low) & (dists <= max_dist * high)
+        selected = pts[keep]
+        if len(selected) < 30:
+            continue
+        direction = fit_direction_pca(selected, pivot)
+        if direction is None:
+            continue
+        out[name] = {"direction": direction, "points": int(len(selected))}
+    return out
+
+
+def arc_correction_delta(baseline_fixed, moving_direction, fixed_mask, pivot):
+    """弧线几何给出的关节夹角修正量。
+
+    用外轮廓方向替换掩膜拟合方向后，夹角的变化量取各窗口的中位数。
+    返回 (delta, meta)，无可用窗口时 delta 为 0。
+    """
+    candidates = arc_direction_candidates(fixed_mask, pivot)
+    if not candidates or baseline_fixed is None or moving_direction is None:
+        return 0.0, {"arc_windows": 0, "arc_deltas": []}
+    base_angle = angle_between(baseline_fixed, moving_direction)
+    deltas = []
+    for item in candidates.values():
+        direction = item["direction"]
+        if np.dot(direction, baseline_fixed) < 0:
+            direction = -direction
+        deltas.append(angle_between(direction, moving_direction) - base_angle)
+    if not deltas:
+        return 0.0, {"arc_windows": 0, "arc_deltas": []}
+    deltas.sort()
+    count = len(deltas)
+    median = deltas[count // 2] if count % 2 else 0.5 * (deltas[count // 2 - 1] + deltas[count // 2])
+    return float(median), {"arc_windows": count, "arc_deltas": [round(v, 3) for v in deltas]}
+
+
+def candidate_angle_spread(mask, pivot, fixed_direction):
+    """移动臂多候选方向造成的角度分歧度（最大值减最小值）。
+
+    与固定臂鲁棒拟合使用同一套距离窗口与两种拟合方法，逐候选算出与
+    固定臂的夹角，其极差反映该图读数的不确定程度。候选不足两个时为 0。
+    """
+    pts = mask_points(mask)
+    if pts is None or pivot is None or fixed_direction is None:
+        return 0.0, {"candidate_count": 0}
+    dists = np.linalg.norm(pts - pivot[None, :], axis=1)
+    max_dist = float(dists.max())
+    if max_dist <= 1.0:
+        return 0.0, {"candidate_count": 0}
+    near = max(12.0, max_dist * 0.10)
+    fit_pts = pts[dists > near]
+    fit_dists = dists[dists > near]
+    if len(fit_pts) < 30:
+        return 0.0, {"candidate_count": 0}
+    angles = []
+    for low, high in FIXED_ARM_WINDOWS:
+        low_dist = max(near, max_dist * low)
+        high_dist = max_dist * high
+        segment = fit_pts[(fit_dists >= low_dist) & (fit_dists <= high_dist)]
+        if len(segment) < 30:
+            continue
+        segment_dists = np.linalg.norm(segment - pivot[None, :], axis=1)
+        weights = np.maximum((segment_dists / (max_dist + 1e-8)) ** 1.8, 1e-3)
+        for direction in (
+            fit_direction_weighted_pca(segment, pivot, weights),
+            fit_direction_radial_median(segment, pivot),
+        ):
+            if direction is None:
+                continue
+            angles.append(angle_between(fixed_direction, direction))
+    if len(angles) < 2:
+        return 0.0, {"candidate_count": len(angles)}
+    return float(max(angles) - min(angles)), {"candidate_count": len(angles)}
+
+
 def fit_fixed_arm_robust(mask, pivot):
     pts = mask_points(mask)
     if pts is None or len(pts) < 30:
@@ -349,6 +458,25 @@ def estimate_angle(image, masks_by_cls, fixed_fit="robust"):
         "conf": {CLASS_NAMES[k]: v["conf"] for k, v in masks_by_cls.items()},
     }
     debug.update(fixed_debug)
+
+    # 弧线几何修正量与候选分歧度：供分级补偿路由使用。
+    # 任一环节失败都退回 0，不影响主读数链路。
+    try:
+        arc_delta, arc_meta = arc_correction_delta(
+            directions[FIXED_ARM], directions[MOVING_ARM], masks_by_cls[FIXED_ARM]["mask"], pivot)
+    except Exception as exc:  # pragma: no cover - 几何退化时的兜底
+        arc_delta, arc_meta = 0.0, {"arc_windows": 0, "arc_error": str(exc)}
+    try:
+        spread, spread_meta = candidate_angle_spread(
+            masks_by_cls[MOVING_ARM]["mask"], pivot, directions[FIXED_ARM])
+    except Exception as exc:  # pragma: no cover - 几何退化时的兜底
+        spread, spread_meta = 0.0, {"candidate_count": 0, "spread_error": str(exc)}
+
+    debug["arc_delta"] = arc_delta
+    debug["candidate_delta_spread"] = spread
+    debug["arc_meta"] = arc_meta
+    debug["spread_meta"] = spread_meta
+    debug["baseline_angle"] = angle_between(baseline_directions.get(FIXED_ARM, directions[FIXED_ARM]), directions[MOVING_ARM])
     return angle, debug
 
 

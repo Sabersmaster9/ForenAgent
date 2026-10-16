@@ -1992,6 +1992,7 @@ def run_from_facts(
     output_dir: str,
     muscle_grade: str = "M5",
     meta_extra: Optional[Dict] = None,
+    selective: Optional[Dict] = None,
 ) -> Tuple[str, str]:
     """从已适配的 RulerFacts 运行确定性规则并写入第五六部分。
 
@@ -2023,6 +2024,7 @@ def run_from_facts(
         legacy_matcher=match_disability,
         calc_joint_loss=calc_joint_loss,
         muscle_grade=muscle_grade,
+        selective=selective,
     )
 
     # --- 三期条款匹配：仅在委托事项明确包含三期时启动 ---
@@ -2086,6 +2088,7 @@ def run_from_facts(
         "period_interval_candidates": period_audit.get("period_interval_candidates", []),
         "period_selection": period_audit.get("period_selection", {}),
         "manual_review_items": manual_review_items,
+        "recompute_plan": disability_audit.get("recompute_plan", {}),
     }
     validation = {
         "status": "pass",
@@ -2175,8 +2178,12 @@ def run_pipeline(
     judge_json_path: str,
     output_dir: Optional[str] = None,
     muscle_grade: str = "M5",
+    selective: Optional[Dict] = None,
 ) -> Tuple[str, str]:
-    """主流程：读取两个JSON → 推理 → 输出第五六部分。"""
+    """主流程：读取两个JSON → 推理 → 输出第五六部分。
+
+    ``selective`` 为选择性重算计划，见 ``match_disability_v2``；为 None 时全量重算。
+    """
     structuring_data = load_json(structuring_json_path)
     judge_data = load_json(judge_json_path)
 
@@ -2199,6 +2206,7 @@ def run_pipeline(
             "structuring_json": structuring_json_path,
             "judge_json": judge_json_path,
         },
+        selective=selective,
     )
 
 

@@ -29,6 +29,32 @@ os.environ.setdefault("OMP_NUM_THREADS", "1")
 GONIOMETER_RUNTIME_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "goniometer")
 DEFAULT_MODEL_PATH = os.path.join(PROJECT_ROOT, "models", "goniometer_seg_best.pt")
 
+
+def resolve_visual_device() -> str:
+    """决定 YOLO 推理设备。
+
+    auto（默认）→ 有 CUDA 就用 cuda:0，否则 cpu。可用 FORENAGENT_VISUAL_DEVICE
+    强制指定（cuda/cpu/cuda:1…）。显式传 device 而不是让 ultralytics 自己猜，
+    是为了能在日志里明确看到实际用了什么——torch 装成 +cpu 时它只会静默走 CPU。
+    """
+    requested = (os.getenv("FORENAGENT_VISUAL_DEVICE") or "auto").strip().lower()
+    if requested in {"cpu"}:
+        return "cpu"
+    try:
+        import torch  # type: ignore
+
+        if torch.cuda.is_available():
+            if requested in {"auto", "gpu", "cuda"}:
+                return "cuda:0"
+            return requested
+        return "cpu"
+    except Exception:
+        return "cpu"
+
+
+VISUAL_DEVICE = resolve_visual_device()
+
+
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff"}
 JOINT_NAMES = ["肩关节", "肘关节", "腕关节", "髋关节", "膝关节", "踝关节"]
 JOINT_SHORT_TO_FULL = {"肩": "肩关节", "肘": "肘关节", "腕": "腕关节", "髋": "髋关节", "膝": "膝关节", "踝": "踝关节"}
@@ -185,6 +211,13 @@ def _build_quality_row(image_id: str, angle: Optional[float], debug: Optional[di
         row["fixed_best_score"] = f"{debug.get('fixed_best_score', 0):.3f}" if debug.get("fixed_best_score") is not None else ""
         row["fixed_old_vs_new_angle_diff"] = runtime["angle_diff"](fixed_dir, baseline_fixed)
 
+        # 分级补偿路由依赖的两个量：弧线几何修正量与候选分歧度。
+        row["arc_delta"] = round(float(debug.get("arc_delta") or 0.0), 3)
+        row["candidate_delta_spread"] = round(float(debug.get("candidate_delta_spread") or 0.0), 3)
+        row["arc_window_count"] = (debug.get("arc_meta") or {}).get("arc_windows", 0)
+        row["moving_candidate_count"] = (debug.get("spread_meta") or {}).get("candidate_count", 0)
+        row["baseline_angle"] = round(float(debug.get("baseline_angle") or 0.0), 3)
+
         fixed_points = debug.get("used_points", {}).get(fixed_arm)
         moving_points = debug.get("used_points", {}).get(moving_arm)
         pivot = debug.get("pivot")
@@ -209,6 +242,11 @@ def _build_quality_row(image_id: str, angle: Optional[float], debug: Optional[di
         row["fixed_consensus_count"] = ""
         row["fixed_best_score"] = ""
         row["fixed_old_vs_new_angle_diff"] = ""
+        row["arc_delta"] = ""
+        row["candidate_delta_spread"] = ""
+        row["arc_window_count"] = ""
+        row["moving_candidate_count"] = ""
+        row["baseline_angle"] = ""
         for prefix in ["fixed", "moving"]:
             row[f"{prefix}_span"] = ""
             row[f"{prefix}_perp_p75"] = ""
@@ -570,7 +608,7 @@ def run_pipeline(
                 continue
 
             predict_conf = min(conf, fallback_conf)
-            result = model.predict(image_path, conf=predict_conf, verbose=False)[0]
+            result = model.predict(image_path, conf=predict_conf, verbose=False, device=VISUAL_DEVICE)[0]
             primary_masks = runtime["collect_masks"](result, image.shape, conf)
             fallback_masks = runtime["collect_masks"](result, image.shape, fallback_conf)
             masks_by_cls, fallback_used = runtime["fill_missing_masks"](primary_masks, fallback_masks)
@@ -647,6 +685,7 @@ def run_pipeline(
         "meta": {
             "input_dir": os.path.abspath(input_dir),
             "model_path": os.path.abspath(resolved_model),
+            "inference_device": VISUAL_DEVICE,
             "conf": conf,
             "fallback_conf": fallback_conf,
             "status": visual_status,

@@ -3032,20 +3032,73 @@ def run_judge(
     return json_path, md_path
 
 
+def build_ruler_selective_plan(
+    overrides: Optional[dict],
+    previous_ruler_json: Optional[str],
+    log: Callable[[str], None],
+) -> Optional[Dict]:
+    """按人工回填的依赖关系生成选择性重算计划。
+
+    解析本次人工修正涉及的字段，得出哪些裁决器必须重跑、哪些条款可以复用
+    上一次结果。任一环节不可用或存在无法识别的回填目标时返回 None，
+    调用方据此退回全量重算。
+    """
+    try:
+        from agents.ruler_agent.dependency import RuleDependency, previous_disability_results
+        from agents.ruler_agent.ruler_agent_main import DISABILITY_CLAUSE_INDEX
+    except Exception as exc:  # pragma: no cover - 依赖模块缺失时保守全量重算
+        log(f"[依赖] 依赖模块不可用，改为全量重算：{exc}")
+        return None
+
+    items: List[dict] = []
+    if isinstance(overrides, dict):
+        raw = overrides.get("fact_overrides") or overrides.get("overrides") or []
+        if isinstance(raw, list):
+            items = [i for i in raw if isinstance(i, dict) and i.get("apply")]
+    elif isinstance(overrides, list):
+        items = [i for i in overrides if isinstance(i, dict) and i.get("apply")]
+
+    previous = previous_disability_results(
+        _read_json(previous_ruler_json) if previous_ruler_json and os.path.isfile(previous_ruler_json) else None
+    )
+    if not previous:
+        log("[依赖] 无可复用的上一次裁决结果，改为全量重算。")
+        return None
+
+    legacy_clauses = [c.get("clause") for c in DISABILITY_CLAUSE_INDEX if isinstance(c, dict)]
+    plan = RuleDependency().plan(items, legacy_clauses=legacy_clauses)
+    plan["previous_results"] = previous
+    log(f"[依赖] 修正涉及字段 {len(plan['field_paths'])} 个，受影响条款 {len(plan['affected_clauses'])} 条；"
+        f"重跑裁决器 {', '.join(plan['run_matchers']) or '无'}，"
+        f"跳过 {', '.join(plan['skip_matchers']) or '无'}，"
+        f"复用 {len(plan['reusable_clauses'])} 条。依据：{plan['reason']}")
+    return plan
+
+
 def run_ruler(
     structuring_json: str,
     judge_json: str,
     output_dir: str,
     log: Callable[[str], None],
+    selective: Optional[Dict] = None,
 ) -> Tuple[str, str]:
-    """Step 4: Ruler Agent → 05_ruler.json；MD仅临时用于报告组装。"""
-    log("[Step 4/4] 运行 Ruler Agent...")
+    """Step 4: Ruler Agent → 05_ruler.json；MD仅临时用于报告组装。
+
+    传入 ``selective`` 时只重算受本次人工修正影响的条款，其余复用上一次结果。
+    """
+    if selective:
+        log(f"[Step 4/4] 运行 Ruler Agent（选择性重算：重跑裁决器 "
+            f"{', '.join(selective.get('run_matchers') or []) or '无'}，"
+            f"复用 {len(selective.get('reusable_clauses') or [])} 条不受影响条款）...")
+    else:
+        log("[Step 4/4] 运行 Ruler Agent...")
     from agents.ruler_agent.ruler_agent_main import run_pipeline as ruler_run
 
     json_path, md_path = ruler_run(
         structuring_json_path=structuring_json,
         judge_json_path=judge_json,
         output_dir=output_dir,
+        selective=selective,
     )
     json_path = _promote_file(json_path, os.path.join(output_dir, STAGE_RULER_JSON))
     md_path = _promote_file(md_path, os.path.join(output_dir, STAGE_RULER_MD)) if os.path.isfile(md_path) else md_path
@@ -4791,7 +4844,9 @@ def run_pipeline(
                     )
                     persist_human_overrides(out, generated_overrides)
                     rerun_started = time.perf_counter()
-                    ruler_json, ruler_md = run_ruler(structuring_json, judge_json, out, log)
+                    selective_plan = build_ruler_selective_plan(generated_overrides, ruler_json, log)
+                    ruler_json, ruler_md = run_ruler(structuring_json, judge_json, out, log,
+                                                     selective=selective_plan)
                     ruler_payload = _read_json(ruler_json)
                     human_review, _human_review_json, _human_draft_json = write_human_review_files(ruler_json, out, log)
                     record_stage("Ruler 重跑", rerun_started, "人工审计后")
@@ -5032,6 +5087,15 @@ def _fit_window_to_screen(
         window.minsize(min(min_width, actual_w), min(min_height, actual_h))
 
 
+_MODEL_HELP_TEXT = (
+    "读取不到本地 Ollama 模型。请确认：\n"
+    "1) 已安装并启动 Ollama；\n"
+    "2) 本地地址填写正确（默认 http://127.0.0.1:11434/v1）；\n"
+    "3) 已用 ollama pull 装过模型。\n\n"
+    "也可以直接手动输入模型名。"
+)
+
+
 def _apply_ui_style(root) -> None:
     """统一 ttk 控件字体与按钮层级，让界面清爽一些。"""
     style = ttk.Style(root)
@@ -5172,12 +5236,15 @@ class BossAgentGUI:
         ttk.Label(frame_llm, text="本地地址:").grid(row=3, column=0, sticky="e", pady=3)
         ttk.Entry(frame_llm, textvariable=self.local_llm_base_url_var, width=48).grid(row=3, column=1, sticky="we", pady=3)
         ttk.Label(frame_llm, text="本地普通模型:").grid(row=4, column=0, sticky="e", pady=3)
-        ttk.Entry(frame_llm, textvariable=self.local_chat_model_var, width=48).grid(row=4, column=1, sticky="we", pady=3)
+        self.chat_model_box = ttk.Combobox(frame_llm, textvariable=self.local_chat_model_var, width=46)
+        self.chat_model_box.grid(row=4, column=1, sticky="we", pady=3)
         ttk.Label(frame_llm, text="本地审计模型:").grid(row=5, column=0, sticky="e", pady=3)
-        ttk.Entry(frame_llm, textvariable=self.local_audit_model_var, width=48).grid(row=5, column=1, sticky="we", pady=3)
+        self.audit_model_box = ttk.Combobox(frame_llm, textvariable=self.local_audit_model_var, width=46)
+        self.audit_model_box.grid(row=5, column=1, sticky="we", pady=3)
         ttk.Label(frame_llm, text="本地LLM设备:").grid(row=6, column=0, sticky="e", pady=3)
         ttk.Combobox(frame_llm, textvariable=self.local_llm_device_var, values=["auto", "gpu", "cpu"], width=10, state="readonly").grid(row=6, column=1, sticky="w", pady=3)
-        ttk.Label(frame_llm, text="auto/gpu 会请求本地 Ollama 尽量使用显卡；不会自动切云端。", style="Hint.TLabel").grid(row=7, column=1, sticky="w", pady=1)
+        ttk.Button(frame_llm, text="刷新已装模型", command=self._refresh_local_models).grid(row=7, column=0, sticky="e", pady=3)
+        ttk.Label(frame_llm, text="从本地 Ollama 读取已安装模型；auto/gpu 会尽量使用显卡，不会自动切云端。", style="Hint.TLabel").grid(row=7, column=1, sticky="w", pady=1)
         ttk.Label(frame_llm, text="云端模型:").grid(row=8, column=0, sticky="e", pady=3)
         ttk.Entry(frame_llm, textvariable=self.cloud_chat_model_var, width=48).grid(row=8, column=1, sticky="we", pady=3)
         frame_llm.columnconfigure(1, weight=1)
@@ -5261,6 +5328,42 @@ class BossAgentGUI:
         parts = [f"材料：{count} 个文件"]
         parts.append(f"照片：{'已选择' if photos else '未选择（跳过视觉）'}")
         self.input_status_label.configure(text="；".join(parts))
+
+    def _list_local_models(self) -> List[str]:
+        """读取本地 Ollama 已安装的模型名；服务未启动时返回空列表。"""
+        import urllib.request
+
+        base = (self.local_llm_base_url_var.get() or "http://127.0.0.1:11434/v1").strip()
+        base = base.rstrip("/")
+        if base.endswith("/v1"):
+            base = base[:-3]
+        try:
+            with urllib.request.urlopen(f"{base}/api/tags", timeout=4) as resp:
+                payload = json.loads(resp.read().decode("utf-8", "replace"))
+        except Exception:
+            return []
+        names = []
+        for item in payload.get("models", []) or []:
+            name = str(item.get("name") or "").strip()
+            if name:
+                names.append(name)
+        return sorted(names)
+
+    def _refresh_local_models(self):
+        """把本地已装模型填进下拉框，方便在 4b / 9b 之间切换。"""
+        models = self._list_local_models()
+        if not models:
+            messagebox.showinfo(
+                "未发现本地模型",
+                _MODEL_HELP_TEXT,
+            )
+            return
+        for box in (self.chat_model_box, self.audit_model_box):
+            box.configure(values=models)
+        current = self.local_chat_model_var.get().strip()
+        if current not in models:
+            self.local_chat_model_var.set(models[0])
+        self._log(f"[模型] 本地已装 {len(models)} 个模型: {', '.join(models)}")
 
     def _browse_human_overrides(self):
         path = filedialog.askopenfilename(

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from typing import Any, Callable, Dict, List, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from .rule_models import DisabilityResult, RulerFacts
 
@@ -650,7 +650,17 @@ def match_disability_v2(
     legacy_matcher: Callable[..., List[Any]],
     calc_joint_loss: Callable[[str, dict, str], dict],
     muscle_grade: str = "M5",
+    selective: Optional[Dict[str, Any]] = None,
 ) -> Tuple[List[DisabilityResult], Dict[str, Any]]:
+    """裁决伤残条款。
+
+    ``selective`` 为可选的选择性重算计划：
+
+        {"run_matchers": [...], "reusable_clauses": {...}, "previous_results": {...}}
+
+    给出且带历史结果时，只运行受本次人工修正影响的裁决器，其余条款
+    直接复用上一次运行的结果；未给出时行为与全量重算完全一致。
+    """
     rejected: List[Dict[str, Any]] = []
     candidates: List[Dict[str, Any]] = []
     results: List[DisabilityResult] = []
@@ -677,10 +687,41 @@ def match_disability_v2(
             "rejected_disability_clauses": rejected,
         }
 
-    results.extend(_spine_disability(facts, rejected))
-    results.extend(_rib_disability(facts))
-    results.extend(_structured_feature_disability(facts))
-    results.extend(_rom_disability(facts, legacy_index, calc_joint_loss, muscle_grade))
+    plan = selective or {}
+    previous = dict(plan.get("previous_results") or {})
+    reusable = set(plan.get("reusable_clauses") or set())
+    selective_active = bool(plan.get("run_matchers") is not None and previous)
+    run_matchers = set(plan.get("run_matchers") or [])
+    skipped_matchers: List[str] = []
+    reused_clauses: List[str] = []
+
+    def _enabled(name: str) -> bool:
+        if not selective_active or name in run_matchers:
+            return True
+        skipped_matchers.append(name)
+        return False
+
+    if _enabled("spine"):
+        results.extend(_spine_disability(facts, rejected))
+    if _enabled("rib"):
+        results.extend(_rib_disability(facts))
+    if _enabled("structured_feature"):
+        results.extend(_structured_feature_disability(facts))
+    if _enabled("rom"):
+        results.extend(_rom_disability(facts, legacy_index, calc_joint_loss, muscle_grade))
+
+    # 被跳过的裁决器所辖条款直接复用上一次结果；只复用不受影响且已有历史结果的条款。
+    if selective_active:
+        produced = {r.clause for r in results if r.clause}
+        for clause in sorted(reusable):
+            if clause in produced:
+                continue
+            cached = previous.get(clause)
+            if cached is None:
+                continue
+            results.append(cached)
+            reused_clauses.append(clause)
+
     if not any(r.grade > 0 for r in results):
         results.extend(_explicit_negative_disability(facts))
 
@@ -692,7 +733,7 @@ def match_disability_v2(
         surgery_history=facts.surgery_history,
         exam_findings=facts.exam_findings,
         aux_findings=facts.aux_findings,
-    )
+    ) if _enabled("legacy") else []
     for r in legacy_results:
         # 旧版曾将“四肢长骨骨折内固定术后”误映射到5.10.6.7；
         # 新版仅在结构化识别“青少年+累及骨骺”时适用该条，避免内固定事实被误判为伤残。
@@ -733,5 +774,13 @@ def match_disability_v2(
         "matched_disability_clauses": [c for c in candidates if c.get("grade", 0) > 0],
         "negative_disability_clauses": [c for c in candidates if c.get("grade", 0) == 0 and str(c.get("match_type", "")).startswith(("negative", "below_threshold"))],
         "rejected_disability_clauses": rejected,
+        "recompute_plan": {
+            "selective": selective_active,
+            "ran_matchers": sorted(run_matchers) if selective_active else ["spine", "rib", "structured_feature", "rom", "legacy"],
+            "skipped_matchers": sorted(set(skipped_matchers)),
+            "reused_clauses": reused_clauses,
+            "reused_count": len(reused_clauses),
+            "recomputed_count": len([c for c in candidates if c.get("clause") not in set(reused_clauses)]),
+        },
     }
     return results, audit

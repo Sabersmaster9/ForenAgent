@@ -557,11 +557,65 @@ def merge_coverage(source_rows: List[Dict[str, Any]], implemented_rows: List[Dic
     return merged
 
 
+def _load_rule_inventory():
+    """导入全量规则模块。脚本方式与包方式运行都能取到。"""
+    import sys
+
+    here = str(Path(__file__).resolve().parent)
+    if here not in sys.path:
+        sys.path.insert(0, here)
+    import rule_inventory  # noqa: WPS433 - 延迟导入以避免包/脚本两种运行方式的差异
+
+    return rule_inventory
+
+
+# disposition → 覆盖矩阵状态
+_STATUS_BY_DISPOSITION = {
+    "auto_decidable": "covered",
+    "structured_manual": "manual_review",
+    "clinical_context": "clinical_context_required",
+}
+
+# 状态集合
+AUTO_STATUS = {"covered", "partially_covered"}
+STRUCTURED_STATUS = AUTO_STATUS | {"manual_review", "clinical_context_required"}
+
+
+def coverage_status_of(disposition: str) -> str:
+    return _STATUS_BY_DISPOSITION.get(disposition, "not_started")
+
+
+def full_disability_rows() -> List[Dict[str, Any]]:
+    """由全量规则集派生伤残覆盖矩阵（全部条款均为机器可执行对象）。"""
+    ri = _load_rule_inventory()
+    rows: List[Dict[str, Any]] = []
+    for rule in ri.build_disability_rules():
+        row = dict(rule)
+        row["coverage_status"] = coverage_status_of(rule["disposition"])
+        row["standard_refs"] = rule["source_heading"]
+        rows.append(row)
+    return rows
+
+
+def full_period_rows() -> List[Dict[str, Any]]:
+    """由全量规则集派生三期覆盖矩阵。"""
+    ri = _load_rule_inventory()
+    rows: List[Dict[str, Any]] = []
+    for rule in ri.build_period_rules():
+        row = dict(rule)
+        row["coverage_status"] = coverage_status_of(rule["disposition"])
+        row["work_loss_range"] = rule.get("误工")
+        row["nursing_range"] = rule.get("护理")
+        row["nutrition_range"] = rule.get("营养")
+        rows.append(row)
+    return rows
+
+
 def write_json_rule_files() -> None:
     RULE_DIR.mkdir(parents=True, exist_ok=True)
     (RULE_DIR / "disability_clauses.json").write_text(json.dumps(IMPLEMENTED_DISABILITY_ROWS, ensure_ascii=False, indent=2), encoding="utf-8")
-    (RULE_DIR / "coverage_disability.json").write_text(json.dumps(merge_coverage(parse_disability_inventory(), IMPLEMENTED_DISABILITY_ROWS), ensure_ascii=False, indent=2), encoding="utf-8")
-    (RULE_DIR / "coverage_period.json").write_text(json.dumps(merge_coverage(parse_period_inventory(), IMPLEMENTED_PERIOD_ROWS), ensure_ascii=False, indent=2), encoding="utf-8")
+    (RULE_DIR / "coverage_disability.json").write_text(json.dumps(full_disability_rows(), ensure_ascii=False, indent=2), encoding="utf-8")
+    (RULE_DIR / "coverage_period.json").write_text(json.dumps(full_period_rows(), ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 def _write_csv(path: Path, rows: List[Dict[str, Any]]) -> None:
@@ -574,14 +628,43 @@ def _write_csv(path: Path, rows: List[Dict[str, Any]]) -> None:
             writer.writerow({k: json.dumps(v, ensure_ascii=False) if isinstance(v, (list, dict)) else v for k, v in row.items()})
 
 
+def generated_manual_review_rows() -> List[Dict[str, Any]]:
+    """由全量规则集按规则族汇总人工审查条目。
+
+    每个规则族一行，条款号为该族全部待人工条款，证据与审查方法取自族定义。
+    """
+    grouped: Dict[str, Dict[str, Any]] = {}
+    for row in full_disability_rows():
+        if row.get("coverage_status") != "manual_review":
+            continue
+        family = row.get("rule_family", "")
+        item = grouped.setdefault(family, {
+            "rule_family": family,
+            "category": row.get("body_region_label", ""),
+            "clause_ids": [],
+            "standard_refs": "",
+            "review_evidence": row.get("review_evidence", ""),
+            "how_to_review": row.get("how_to_review", ""),
+            "required_fact_fields": row.get("required_fact_fields", []),
+        })
+        item["clause_ids"].append(row.get("clause_id", ""))
+    for item in grouped.values():
+        item["clause_count"] = len(item["clause_ids"])
+        item["standard_refs"] = f"{item['clause_count']} 条：" + "、".join(item["clause_ids"][:8]) + (
+            " 等" if item["clause_count"] > 8 else "")
+    return sorted(grouped.values(), key=lambda x: -x["clause_count"])
+
+
 def _write_manual_review_report() -> None:
-    _write_csv(RUN_DIR / "manual_review_items.csv", MANUAL_REVIEW_ROWS)
-    lines = ["# Ruler manual review guide", ""]
-    for row in MANUAL_REVIEW_ROWS:
+    rows = generated_manual_review_rows()
+    _write_csv(RUN_DIR / "manual_review_items.csv", rows)
+    lines = ["# Ruler 人工审查指南", "",
+             f"共 {len(rows)} 个规则族，覆盖 {sum(r['clause_count'] for r in rows)} 条需人工判断的伤残条款。", ""]
+    for row in rows:
         lines.extend([
-            f"## {row['category']}：{row['rule_family']}",
-            f"- 标准范围：{row['standard_refs']}",
-            f"- 为什么需要人工审查：{row['why_manual']}",
+            f"## {row['category']}：{row['rule_family']}（{row['clause_count']} 条）",
+            f"- 涉及条款：{row['standard_refs']}",
+            f"- 必需事实字段：{'、'.join(row['required_fact_fields']) or '—'}",
             f"- 需要证据：{row['review_evidence']}",
             f"- 审查方法：{row['how_to_review']}",
             "",
@@ -598,34 +681,63 @@ def build_coverage_reports() -> Dict[str, Any]:
     _write_csv(RUN_DIR / "coverage_period.csv", period)
     _write_manual_review_report()
     summary = coverage_snapshot(disability, period)
+    manual_rows = generated_manual_review_rows()
     (RUN_DIR / "validation_summary.md").write_text(
-        "# Ruler rule coverage summary\n\n"
-        f"- 伤残条款矩阵行数：{summary['disability_total']}\n"
-        f"- 伤残 covered/partially_covered：{summary['disability_covered']}\n"
-        f"- 三期条款矩阵行数：{summary['period_total']}\n"
-        f"- 三期 covered/partially_covered：{summary['period_covered']}\n"
-        f"- 人工审查规则族：{len(MANUAL_REVIEW_ROWS)}\n"
-        "\n详见 `manual_review_guide.md` 和 `manual_review_items.csv`。\n",
+        "# Ruler 规则覆盖摘要\n\n"
+        "## 伤残条款（《人体损伤致残程度分级》）\n"
+        f"- 条款矩阵行数：{summary['disability_total']}\n"
+        f"- 自动可裁决：{summary['disability_covered']}\n"
+        f"- 结构化转人工：{summary['disability_manual_review']}\n"
+        f"- 已结构化合计：{summary['disability_structured']}"
+        f"（结构化率 {summary['disability_structured_rate']:.2%}）\n\n"
+        "## 三期条款（GA/T 1193-2014）\n"
+        f"- 条款矩阵行数：{summary['period_total']}\n"
+        f"- 自动可裁决：{summary['period_covered']}\n"
+        f"- 需临床背景：{summary['period_clinical_context']}\n"
+        f"- 已结构化合计：{summary['period_structured']}"
+        f"（结构化率 {summary['period_structured_rate']:.2%}）\n\n"
+        "## 人工审查\n"
+        f"- 人工审查规则族：{len(manual_rows)}\n"
+        f"- 覆盖需人工判断的伤残条款：{sum(r['clause_count'] for r in manual_rows)}\n\n"
+        "详见 `manual_review_guide.md` 和 `manual_review_items.csv`。\n",
         encoding="utf-8",
     )
     return summary
 
 
-def coverage_snapshot(disability_rows: List[Dict[str, Any]] | None = None, period_rows: List[Dict[str, Any]] | None = None) -> Dict[str, int]:
+def coverage_snapshot(disability_rows: List[Dict[str, Any]] | None = None, period_rows: List[Dict[str, Any]] | None = None) -> Dict[str, Any]:
+    """覆盖快照。
+
+    disability_covered / period_covered 为**自动可裁决**条款数；
+    disability_structured / period_structured 为**已结构化**条款数
+    （自动裁决 + 结构化转人工 + 需临床背景），即机器可执行对象的总数。
+    """
     try:
         if disability_rows is None:
             disability_rows = json.loads((RULE_DIR / "coverage_disability.json").read_text(encoding="utf-8"))
         if period_rows is None:
             period_rows = json.loads((RULE_DIR / "coverage_period.json").read_text(encoding="utf-8"))
     except FileNotFoundError:
-        disability_rows = merge_coverage(parse_disability_inventory(), IMPLEMENTED_DISABILITY_ROWS)
-        period_rows = merge_coverage(parse_period_inventory(), IMPLEMENTED_PERIOD_ROWS)
-    covered_values = {"covered", "partially_covered"}
+        disability_rows = full_disability_rows()
+        period_rows = full_period_rows()
+
+    def count(rows: List[Dict[str, Any]], statuses: set) -> int:
+        return sum(1 for r in rows if r.get("coverage_status") in statuses)
+
+    d_total, p_total = len(disability_rows), len(period_rows)
+    d_auto, p_auto = count(disability_rows, AUTO_STATUS), count(period_rows, AUTO_STATUS)
+    d_struct, p_struct = count(disability_rows, STRUCTURED_STATUS), count(period_rows, STRUCTURED_STATUS)
     return {
-        "disability_total": len(disability_rows),
-        "disability_covered": sum(1 for r in disability_rows if r.get("coverage_status") in covered_values),
-        "period_total": len(period_rows),
-        "period_covered": sum(1 for r in period_rows if r.get("coverage_status") in covered_values),
+        "disability_total": d_total,
+        "disability_covered": d_auto,
+        "disability_structured": d_struct,
+        "disability_manual_review": count(disability_rows, {"manual_review"}),
+        "period_total": p_total,
+        "period_covered": p_auto,
+        "period_structured": p_struct,
+        "period_clinical_context": count(period_rows, {"clinical_context_required"}),
+        "disability_structured_rate": round(d_struct / d_total, 4) if d_total else 0.0,
+        "period_structured_rate": round(p_struct / p_total, 4) if p_total else 0.0,
     }
 
 
