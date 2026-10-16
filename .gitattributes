@@ -1,3 +1,6 @@
 # Windows 批处理必须是 CRLF，否则 cmd 解析失败、双击无反应
-*.bat text eol=crlf
+*.bat text eol=crlf working-tree-encoding=GBK
+# 中文 Windows 的 cmd 默认码页是 936(GBK)。
+# 若存成 UTF-8，配合 chcp 65001 会触发 cmd 按字节重读脚本时的偏移错位，
+# 汉字被切成两半、整行错乱，表现为"xxx is not recognized"或双击无反应。
 *.cmd text eol=crlf

@@ -1,5 +1,5 @@
 @echo off
-chcp 65001 >nul
+chcp 936 >nul
 title ForenAgent 1.0 — 鉴定意见书生成
 setlocal
 
