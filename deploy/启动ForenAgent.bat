@@ -70,6 +70,15 @@ set "PYTHONUTF8=1"
 set "PYTHONIOENCODING=utf-8"
 set "KMP_DUPLICATE_LIB_OK=TRUE"
 
+rem ---- OCR 设备开关（排查用，见补丁说明）----
+rem auto = 有 CUDA 就用 GPU；cpu = 强制走 CPU（慢一些，但兼容性最好）
+rem 目标机是 RTX 5060 Ti（sm_120），环境里的 Paddle 是 cu126 构建，很可能不含
+rem sm_120 的 kernel，会造成「PDF 读得出、图片读不出」这种不报错的失败。
+rem 验证完、或换成支持 sm_120 的 Paddle 之后，把这行改回 auto 或直接删掉。
+set "FORENAGENT_LOCAL_OCR_DEVICE=cpu"
+rem CPU 跑 OCR 的线程数。程序默认只给 2，63 张图的案子会等到天荒地老，给到 8。
+set "FORENAGENT_LOCAL_OCR_CPU_THREADS=8"
+
 rem Tcl/Tk 库目录（关键，缺了图形界面起不来）
 rem 运行环境是 conda 打包出来的。直接调用 env\python.exe 时不会执行 conda 的
 rem activate 脚本，Tcl 找不到自己的库目录，界面会以
