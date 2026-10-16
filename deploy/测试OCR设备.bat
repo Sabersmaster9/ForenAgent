@@ -4,8 +4,10 @@ title ForenAgent OCR 设备自检
 setlocal
 
 rem ============================================================
-rem  测一下这台机器的 OCR 能不能走 GPU。
-rem  不动案件数据，只造一张图跑一次，十几秒出结果。
+rem  对比 CPU 与 GPU 两种设备下 OCR 能不能真的识别出文字。
+rem  不动案件数据，自己造图，一两分钟出结果。
+rem
+rem  分两次调用，因为 PaddleX 一个进程只能初始化一次。
 rem ============================================================
 
 set "ROOT=%~dp0"
@@ -42,8 +44,20 @@ set "XDG_CACHE_HOME=%PADDLE_CACHE%\xdg"
 set "KMP_DUPLICATE_LIB_OK=TRUE"
 cd /d "%APP%"
 
-"%ENV%\python.exe" "%ROOT%测试OCR设备.py"
+echo.
+echo   ########## 第一轮：CPU ##########
+echo.
+"%ENV%\python.exe" "%ROOT%测试OCR设备.py" cpu
 
+echo.
+echo   ########## 第二轮：GPU（auto）##########
+echo.
+"%ENV%\python.exe" "%ROOT%测试OCR设备.py" auto
+
+echo.
+echo   ============================================
+echo    哪一轮能识别出文字，启动脚本里就设哪个设备
+echo   ============================================
 echo.
 pause
 endlocal
