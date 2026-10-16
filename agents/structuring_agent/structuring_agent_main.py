@@ -898,6 +898,12 @@ IDENTITY_NEGATIVE_FILENAME_KEYWORDS = ["被告", "公司", "法定代表人", "�
 IDENTITY_POSITIVE_CONTENT_KEYWORDS = ["姓名", "性别", "民族", "出生", "住址", "公民身份号码", "身份证号码", "身份证号"]
 SUBJECT_NAME_BAD_KEYWORDS = [
     "性别", "民族", "出生", "住址", "地址", "号码", "身份", "法院", "医院", "公司", "中心", "委托", "鉴定", "材料", "病历",
+    # 案卷里高频出现、且会被“原告/申请人”类标签连带捕获的非姓名词。
+    # 典型误抽：文件名「原告证据-门诊病历1.jpg」→ 正则从「原告证据」里截出「证据」，
+    # 而它与真实姓名同分，谁先出现谁赢，OCR 一抖动就会顶掉真名。
+    "证据", "原告", "被告", "申请人", "被申请人", "第三人", "当事人", "代理人", "诉讼",
+    "照片", "报告", "证明", "诊断", "身份证", "户口", "保险", "公安", "交警", "事故",
+    "起诉状", "委托书", "笔录", "责任", "认为", "权益", "损伤", "受伤", "碰撞", "受伤",
 ]
 SUBJECT_ADDRESS_POLLUTION_RE = re.compile(
     r"预检|分诊|就诊|门诊号|住院号|病案号|病历号|科室|检查号|影像号|CT|MRI|MR|DR|X线|报告单|打印时间|扫描时间|"
@@ -1016,6 +1022,9 @@ def _is_valid_subject_name(value: str) -> bool:
         return False
     if re.search(r"[男女]民$|^姓名$|^被鉴定人$|^原告$|^患者$", text):
         return False
+    # 从句子里截出来的片段通常带这些起首字，不是姓名。
+    if text[0] in "的该其本此这为与和及对将把被":
+        return False
     return True
 
 
@@ -1085,7 +1094,16 @@ def _extract_identity_fields_from_text(text: str) -> dict:
     content = text or ""
     compact = re.sub(r"[ \t]+", "", content)
     payload = {}
-    name_match = re.search(r"(?:姓名|原告|被鉴定人|患者姓名|病人姓名|委托人的姓名)[:：]?\s*([一-龥]{2,5})", compact)
+    # 冒号若可选，「原告证据-门诊病历1.jpg」这类文本会被截出「证据」当姓名。
+    # 这里要求：要么有冒号，要么后面紧跟姓名语境词（性别/男/女/民族…）。
+    name_match = re.search(
+        r"(?:姓名|患者姓名|病人姓名|委托人的姓名|被鉴定人|原告|申请人|受检者)\s*[:：]\s*([一-龥]{2,5})",
+        compact,
+    ) or re.search(
+        r"(?:姓名|被鉴定人|原告|申请人|受检者)\s*([一-龥]{2,5})"
+        r"(?=\s*(?:性别|男|女|民族|出生|住址|公民身份|身份证|，|,|。|；|;|$))",
+        compact,
+    )
     gender_match = re.search(r"性别[:：]?\s*(男|女|男性|女性)", compact)
     ethnicity_match = re.search(r"民族[:：]?\s*([一-龥]{1,3})", compact)
     birth_match = re.search(r"出生[:：]?\s*((?:19|20)\d{2}年\d{1,2}月\d{1,2}日)", compact)
@@ -1164,6 +1182,14 @@ def _best_subject_name_from_blocks(blocks: List[dict], joined: str = "") -> tupl
     warnings: List[str] = []
     if len(candidates) >= 2 and candidates[0]["name"] != candidates[1]["name"] and candidates[1]["score"] >= candidates[0]["score"] - 8:
         warnings.append(f"被鉴定人姓名存在多个候选：{candidates[0]['name']}、{candidates[1]['name']}，建议核对身份证及委托书。")
+    # 身份证/病历标签命中时分数在 70 以上；只有 45 上下说明姓名是从叙述性文字里
+    # 猜出来的（多为 OCR 没读到身份证/病历时）。这种情况必须让人来确认，
+    # 不能默不作声地把一个猜出来的名字写进正式文书。
+    if candidates[0]["score"] < 50:
+        warnings.append(
+            f"被鉴定人姓名「{candidates[0]['name']}」来自低置信来源（{candidates[0]['source']}，"
+            f"依据：{candidates[0]['reason']}），未在身份证/病历上找到姓名标签，请人工核对。"
+        )
     return candidates[0]["name"], warnings
 
 

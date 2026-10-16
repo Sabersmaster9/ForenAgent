@@ -4490,8 +4490,34 @@ def _format_human_change_summary_section(change_log: Optional[dict]) -> str:
     return "\n".join(lines)
 
 
+def _structuring_llm_status(out: str) -> str:
+    """读结构化摘要里的「混合补全」一行，转成审计报告能看懂的说法。
+
+    抽取阶段调用 LLM 失败时会静默退回规则结果：正文看起来完全正常，事后从报告上
+    分辨不出这次的 LLM 到底有没有起作用。把这件事显式写进审计报告。
+    """
+    path = os.path.join(out, STAGE_WORK_DIR, STAGE_STRUCTURING_MD)
+    if not os.path.isfile(path):
+        return ""
+    try:
+        with open(path, "r", encoding="utf-8", errors="ignore") as handle:
+            for line in handle:
+                if "混合补全" not in line:
+                    continue
+                if "LLM调用=是" not in line:
+                    return "未调用 LLM（规则抽取已覆盖有效信息）"
+                if "有效补全=否" in line:
+                    return ("⚠ 调用了 LLM 但未获得有效补全，已退回规则抽取结果。"
+                            "第一、三部分可能偏薄，建议重点复核；材料偏少或本地模型输出不合格式时常见。")
+                return "LLM 补全有效"
+    except OSError:
+        pass
+    return ""
+
+
 def _format_runtime_audit_report(runtime_metrics: Optional[dict], change_log: Optional[dict] = None) -> str:
     metrics = runtime_metrics or {}
+    llm_status = metrics.get("structuring_llm_status") or ""
     lines = [
         "# Boss 运行摘要",
         "",
@@ -4499,6 +4525,7 @@ def _format_runtime_audit_report(runtime_metrics: Optional[dict], change_log: Op
         "",
         f"- 处理文件数（1 鉴定材料）：{int(metrics.get('material_file_count') or 0)}",
         f"- 模型调用：{metrics.get('runtime_summary') or '不详'}",
+        *([f"- 结构化抽取：{llm_status}"] if llm_status else []),
         f"- 人工审计：{metrics.get('human_audit_status') or '未发生'}",
         f"- 工作总耗时：{_format_elapsed(metrics.get('total_elapsed_seconds'))}",
         f"- 墙钟总耗时（含等待）：{_format_elapsed(metrics.get('wall_elapsed_seconds'))}",
@@ -4950,6 +4977,7 @@ def run_pipeline(
         runtime_metrics = {
             "material_file_count": material_file_count,
             "runtime_summary": config.summary(),
+            "structuring_llm_status": _structuring_llm_status(out),
             "human_audit_status": f"已发生（实际操作 {_format_elapsed(human_audit_elapsed)}，等待不计）" if human_audit_occurred else "未发生（无交互模式）",
             "wall_elapsed_seconds": time.perf_counter() - pipeline_started,
             "total_elapsed_seconds": _sum_stage_elapsed(runtime_stages),

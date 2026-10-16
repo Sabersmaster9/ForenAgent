@@ -353,7 +353,19 @@ def _burn_scar_period_from_facts(facts: RulerFacts) -> List[Dict[str, Any]]:
     joined = f"{facts.all_text or ''} {evidence}"
     burn_pct = _to_int(scar.get("burn_total_tbsa_percent") or facts.rule_features.get("burn_total_tbsa_percent"))
     scar_pct = _to_int(scar.get("body_surface_pct") or scar.get("scar_bsa_percent") or facts.rule_features.get("body_scar_pct"))
-    has_burn = bool(burn_pct or scar_pct or any(k in joined for k in ["烧伤", "烫伤", "植皮", "削痂", "清创", "瘢痕", "疤痕"]))
+    # 11.1 是针对烧烫伤的条款，手术切口留下的「手术瘢痕」不属于它。
+    # 原实现只要文中出现「瘢痕/疤痕/清创」就判为烧烫伤，于是「左膝外侧见10.5cm
+    # 纵行手术瘢痕」这种骨折术后描述会被套上 11.1 的三期区间（10.2 骨折的误工
+    # 上限 180 日，被换成 11.1 的区间，条款依据也跟着写错）。
+    # 这里改为：必须有烧烫伤本身、烧烫伤专属治疗，或明确的面积百分比才算数。
+    burn_words = ("烧伤", "烫伤", "灼伤", "热液", "蒸汽", "化学烧伤", "电击伤", "火焰")
+    burn_treatment = ("植皮", "削痂", "切痂", "瘢痕挛缩", "压力衣", "抗瘢痕治疗")
+    has_burn = bool(
+        burn_pct
+        or scar_pct
+        or any(k in joined for k in burn_words)
+        or any(k in joined for k in burn_treatment)
+    )
     if not has_burn:
         return []
     if burn_pct >= 70 or scar_pct >= 50 or any(k in joined for k in ["特重度", "大面积", "多次植皮", "睑外翻", "小口畸形"]):
