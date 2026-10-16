@@ -99,11 +99,16 @@ set "PADDLE_HOME=%PADDLE_CACHE%\paddle"
 set "XDG_CACHE_HOME=%PADDLE_CACHE%\xdg"
 
 rem ---- (2) OCR 设备 ----
-rem cpu = 强制走 CPU（慢，但一定可用）；auto = 有 CUDA 就优先用 GPU。
-rem 目标机是 RTX 5060 Ti（sm_120），环境里的 Paddle 是 cu126 构建，很可能不含
-rem sm_120 的 kernel。先按 cpu 把流程跑通，确认无误后再试着改回 auto 看 GPU 能否用。
-set "FORENAGENT_LOCAL_OCR_DEVICE=cpu"
-rem CPU 跑 OCR 的线程数。程序默认只给 2，60 多张图的案子会等到天荒地老，给到 8。
+rem auto = 有 CUDA 就优先用 GPU（下面用这个）；cpu = 强制走 CPU。
+rem 目标机 RTX 5060 Ti 实测可以走 GPU：单张 0.01 秒，CPU 要 7~8 秒，
+rem 一个 60 多张图的案子能差出十几分钟，所以这里用 auto。
+rem
+rem 注意：目标机上 Paddle 会打一条 CUDNN/CUDA 版本不匹配的 WARNING，
+rem 说「may cause serious incompatible bug」。用「测试OCR设备.bat」实测过，
+rem 两次识别结果都完全正确。万一以后发现文字识别异常（错字、漏字明显变多），
+rem 把下面这行改成 cpu 即可：慢，但一定稳。
+set "FORENAGENT_LOCAL_OCR_DEVICE=auto"
+rem CPU 跑 OCR 的线程数（只在退到 CPU 时生效）。程序默认只给 2，给到 8。
 set "FORENAGENT_LOCAL_OCR_CPU_THREADS=8"
 
 rem Tcl/Tk 库目录（关键，缺了图形界面起不来）
