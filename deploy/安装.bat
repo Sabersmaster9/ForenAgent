@@ -35,16 +35,35 @@ echo   [1/4] 释放 Python 运行环境……
 if exist "%ENV%\python.exe" (
     echo         已存在，跳过解压。
 ) else (
+    rem U 盘多为 FAT32，单文件上限 4GB，因此 env.zip 以分卷形式分发（env.zip.part00…）。
+    rem 若只找到分卷，先用 copy /b 拼回完整 zip。
+    if not exist "%ROOT%env.zip" (
+        if exist "%ROOT%env.zip.part00" (
+            echo         检测到分卷文件，正在合并……
+            copy /b "%ROOT%env.zip.part*" "%ROOT%env.zip" >nul
+            if not exist "%ROOT%env.zip" (
+                echo.
+                echo   [错误] 分卷合并失败。
+                echo.
+                pause
+                exit /b 1
+            )
+            echo         合并完成。
+        )
+    )
     if not exist "%ROOT%env.zip" (
         echo.
-        echo   [错误] 未找到 env.zip，安装包不完整。
-        echo          请确认 env.zip 与「安装.bat」在同一目录下。
+        echo   [错误] 未找到 env.zip 或 env.zip.part00，安装包不完整。
+        echo          请确认 env.zip.part00 / part01 / part02 与「安装.bat」在同一目录下。
         echo.
         pause
         exit /b 1
     )
-    echo         正在解压 env.zip（约 4GB，请耐心等待）……
-    powershell -NoProfile -Command "Expand-Archive -LiteralPath '%ROOT%env.zip' -DestinationPath '%ROOT%' -Force"
+    echo         正在解压 env.zip（约 5GB，解压后约 9GB，请耐心等待）……
+    rem conda-pack 产出的 zip 内容在根层（Lib/、DLLs/ …），必须显式解到 env\ 下，
+    rem 否则会把环境文件散落到安装包根目录。
+    if not exist "%ENV%" mkdir "%ENV%"
+    powershell -NoProfile -Command "Expand-Archive -LiteralPath '%ROOT%env.zip' -DestinationPath '%ENV%' -Force"
     if errorlevel 1 (
         echo.
         echo   [错误] 解压失败。可能原因：

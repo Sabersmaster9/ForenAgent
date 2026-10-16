@@ -1,0 +1,3 @@
+# Windows 批处理必须是 CRLF，否则 cmd 解析失败、双击无反应
+*.bat text eol=crlf
+*.cmd text eol=crlf
