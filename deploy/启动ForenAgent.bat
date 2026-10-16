@@ -70,13 +70,40 @@ set "PYTHONUTF8=1"
 set "PYTHONIOENCODING=utf-8"
 set "KMP_DUPLICATE_LIB_OK=TRUE"
 
-rem ---- OCR 设备开关（排查用，见补丁说明）----
-rem auto = 有 CUDA 就用 GPU；cpu = 强制走 CPU（慢一些，但兼容性最好）
+rem ============================================================
+rem  OCR 相关设置
+rem ============================================================
+rem ---- (1) 模型缓存必须放在纯英文路径 ----
+rem Paddle 的 C++ 推理层用窄字符 API 打开模型文件：路径里只要有中文，文件就打不开，
+rem 它拿到一个空流，抛 [json.exception.parse_error.101] attempting to parse an
+rem empty input。现象是所有照片 OCR 全部失败，而 PDF 因为有文字层走文本抽取、
+rem 不经过 OCR，看起来「只有一个文件成功」，极容易被误判成显卡问题。
+rem 所以模型缓存统一搬到 %ProgramData%\ForenAgent（固定英文路径）下。
+set "PADDLE_CACHE=%ProgramData%\ForenAgent\models\cache"
+if not exist "%PADDLE_CACHE%\paddlex\official_models\PP-OCRv5_mobile_det\inference.pdiparams" (
+    echo   首次运行：正在把 OCR 模型缓存复制到英文路径（约 200MB），请稍候……
+    if not exist "%APP%\models\cache\paddlex" (
+        echo   [错误] 程序目录下找不到 OCR 模型缓存：%APP%\models\cache\paddlex
+        echo          请重新从安装包拷贝 app 文件夹。
+        echo.
+        pause
+        exit /b 1
+    )
+    if not exist "%PADDLE_CACHE%" mkdir "%PADDLE_CACHE%"
+    xcopy "%APP%\models\cache\*" "%PADDLE_CACHE%\" /E /I /Q /Y >nul
+    echo   完成。
+)
+set "PADDLE_PDX_CACHE_HOME=%PADDLE_CACHE%\paddlex"
+set "PADDLEOCR_HOME=%PADDLE_CACHE%\paddleocr"
+set "PADDLE_HOME=%PADDLE_CACHE%\paddle"
+set "XDG_CACHE_HOME=%PADDLE_CACHE%\xdg"
+
+rem ---- (2) OCR 设备 ----
+rem cpu = 强制走 CPU（慢，但一定可用）；auto = 有 CUDA 就优先用 GPU。
 rem 目标机是 RTX 5060 Ti（sm_120），环境里的 Paddle 是 cu126 构建，很可能不含
-rem sm_120 的 kernel，会造成「PDF 读得出、图片读不出」这种不报错的失败。
-rem 验证完、或换成支持 sm_120 的 Paddle 之后，把这行改回 auto 或直接删掉。
+rem sm_120 的 kernel。先按 cpu 把流程跑通，确认无误后再试着改回 auto 看 GPU 能否用。
 set "FORENAGENT_LOCAL_OCR_DEVICE=cpu"
-rem CPU 跑 OCR 的线程数。程序默认只给 2，63 张图的案子会等到天荒地老，给到 8。
+rem CPU 跑 OCR 的线程数。程序默认只给 2，60 多张图的案子会等到天荒地老，给到 8。
 set "FORENAGENT_LOCAL_OCR_CPU_THREADS=8"
 
 rem Tcl/Tk 库目录（关键，缺了图形界面起不来）
