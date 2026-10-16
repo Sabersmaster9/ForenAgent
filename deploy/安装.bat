@@ -63,7 +63,15 @@ if exist "%ENV%\python.exe" (
     rem conda-pack 产出的 zip 内容在根层（Lib/、DLLs/ …），必须显式解到 env\ 下，
     rem 否则会把环境文件散落到安装包根目录。
     if not exist "%ENV%" mkdir "%ENV%"
-    powershell -NoProfile -Command "Expand-Archive -LiteralPath '%ROOT%env.zip' -DestinationPath '%ENV%' -Force"
+    rem 优先用 Windows 自带的 tar(bsdtar)：解 6 万多个文件只要几分钟，
+    rem 而 PowerShell 的 Expand-Archive 属于纯托管实现，同样内容要跑几小时。
+    where tar >/dev/null 2>&1
+    if not errorlevel 1 (
+        tar -xf "%ROOT%env.zip" -C "%ENV%"
+    ) else (
+        echo         未找到 tar，改用 PowerShell 解压（会很慢，请耐心等待）……
+        powershell -NoProfile -Command "Expand-Archive -LiteralPath '%ROOT%env.zip' -DestinationPath '%ENV%' -Force"
+    )
     if errorlevel 1 (
         echo.
         echo   [错误] 解压失败。可能原因：
