@@ -16,6 +16,36 @@ import subprocess
 import sys
 import threading
 import time
+
+
+def _ensure_tcl_library() -> None:
+    """conda 打包的环境脱离 activate 直接运行时，补上 Tcl/Tk 库目录。
+
+    直接调用 env\\python.exe 不会执行 conda 的 activate 脚本，Tcl 找不到自己的
+    库目录，导入 tkinter 后创建解释器会以
+        _tkinter.TclError: Can't find a usable init.tcl ...
+    报错退出。这里在 import tkinter 之前按需补上，使无论从哪个入口启动都能起界面。
+    """
+    if os.environ.get("TCL_LIBRARY") and os.environ.get("TK_LIBRARY"):
+        return
+    roots = []
+    for root in (sys.prefix, sys.exec_prefix, os.path.dirname(sys.executable)):
+        if root and root not in roots:
+            roots.append(root)
+    for root in roots:
+        for rel in (os.path.join("Library", "lib"), "tcl", "lib"):
+            tcl = os.path.join(root, rel, "tcl8.6")
+            tk = os.path.join(root, rel, "tk8.6")
+            if not os.environ.get("TCL_LIBRARY") and os.path.isfile(os.path.join(tcl, "init.tcl")):
+                os.environ["TCL_LIBRARY"] = tcl
+            if not os.environ.get("TK_LIBRARY") and os.path.isdir(tk):
+                os.environ["TK_LIBRARY"] = tk
+            if os.environ.get("TCL_LIBRARY"):
+                return
+
+
+_ensure_tcl_library()
+
 import tkinter as tk
 from difflib import SequenceMatcher
 from pathlib import Path

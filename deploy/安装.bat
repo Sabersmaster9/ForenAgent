@@ -65,7 +65,7 @@ if exist "%ENV%\python.exe" (
     if not exist "%ENV%" mkdir "%ENV%"
     rem 优先用 Windows 自带的 tar(bsdtar)：解 6 万多个文件只要几分钟，
     rem 而 PowerShell 的 Expand-Archive 属于纯托管实现，同样内容要跑几小时。
-    where tar >/dev/null 2>&1
+    where tar >nul 2>&1
     if not errorlevel 1 (
         tar -xf "%ROOT%env.zip" -C "%ENV%"
     ) else (
@@ -118,6 +118,10 @@ if not exist "%APP%\models\goniometer_seg_best.pt" (
 )
 if not exist "%APP%\files\知识库\知识库_条例\人体损伤致残程度分级.md" (
     echo         [缺失] app\files\知识库\知识库_条例\人体损伤致残程度分级.md（规则引擎查表源）
+    set "FAIL=1"
+)
+if not exist "%ENV%\Library\lib\tcl8.6\init.tcl" (
+    echo         [缺失] env\Library\lib\tcl8.6\init.tcl（图形界面依赖）
     set "FAIL=1"
 )
 if "%FAIL%"=="1" (
