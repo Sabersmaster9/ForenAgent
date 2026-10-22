@@ -1,5 +1,22 @@
 # ForenAgent 1.0 — 法医临床司法鉴定 × 多智能体 LLM × 计算机视觉系统
 
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
+![License](https://img.shields.io/badge/License-MIT-green)
+![Status](https://img.shields.io/badge/Status-Research%20Prototype-orange)
+
+> **English overview** — ForenAgent is a research prototype for generating forensic clinical assessment reports in judicial disability evaluation. It pairs local-first OCR/LLM fact extraction and human-confirmed goniometer readings with a deterministic rule engine for range-of-motion (ROM) loss grading, disability-clause matching and recovery-period assessment. LLMs handle summarisation, structuring and drafting; every legally decisive conclusion comes from auditable rules. Developed with the Zhejiang University Forensic Identification Center.
+>
+> **At a glance**
+> - **Pipeline:** Extractor → Structuring → Visual → Judge → Ruler → Boss Agent
+> - **Design principle:** LLM for language, rules for conclusions — reproducible and traceable by construction
+> - **Privacy:** local-first OCR and optional on-prem LLM; case data stays on the machine
+> - **Outputs:** structured JSON evidence, a Markdown draft, and a unified audit report
+> - **Status:** research prototype — outputs are review material for forensic examiners, not final opinions
+>
+> 中文说明见下文。
+
+---
+
 ForenAgent 1.0 是一个面向**法医临床司法鉴定意见书生成**的端到端研究原型。系统把案卷材料 OCR、事实结构化、检验记录整理、量角器图像读数、ROM 功能丧失率查表、伤残条款匹配、三期评定和报告审计拆分为可替换、可复核的多智能体流水线。
 
 本项目的核心定位不是让大模型直接裁决鉴定结论，而是构建一个：
